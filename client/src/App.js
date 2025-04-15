@@ -3,8 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import './App.css';
 
-const SERVER_URL = "http://localhost:4000";
-
 // --- Composants Card, PlayerCards ---
 function Card({ card }) {
     if (!card) return <div className="card empty"></div>;
@@ -57,23 +55,41 @@ function App() {
     const scrollToBottom = () => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); };
     useEffect(scrollToBottom, [messages]); // Scroll chat
 
+    // *** CODE CORRIGÉ ICI : Un seul useEffect pour le socket ***
     useEffect(() => { // Connexion Socket & Listeners
-        socketRef.current = io(SERVER_URL, { reconnectionAttempts: 5, reconnectionDelay: 1000 });
+        // Utilise la variable d'environnement définie dans .env.local (local) ou Vercel (déployé)
+        const socketIoUrl = process.env.REACT_APP_SOCKET_URL;
+
+        // Si la variable n'est pas définie, afficher une erreur et sortir
+        if (!socketIoUrl) {
+            console.error("ERREUR: La variable d'environnement REACT_APP_SOCKET_URL n'est pas définie !");
+            setError("Configuration du serveur manquante."); // Informer l'utilisateur
+            return; // Important: sortir de l'effet si l'URL manque
+        }
+
+        console.log(`Tentative de connexion à : ${socketIoUrl}`); // Log pour débogage
+
+        // Initialisation de la connexion
+        // On assigne le socket à la référence useRef
+        socketRef.current = io(socketIoUrl, { reconnectionAttempts: 5, reconnectionDelay: 1000 });
+        // On crée une variable locale 'socket' pour simplifier l'accès dans ce scope
         const socket = socketRef.current;
 
+        // --- Listeners ---
+        // (Tous les listeners sont ajoutés sur l'instance 'socket' créée ci-dessus)
         socket.on('connect', () => { setIsConnected(true); setError(''); console.log('Connected'); });
         socket.on('disconnect', (r) => { setIsConnected(false); setCurrentTableId(null); setActiveTableDetails(null); setError('Déconnecté...'); console.log(`Disconnected: ${r}`); });
         socket.on('connect_error', (err) => { setError(`Conn Error: ${err.message}`); console.error(err); });
 
         socket.on('username_set', (n) => {
-            console.log('>>> CLIENT RECEIVED username_set:', n); // Log pour débogage
+            console.log('>>> CLIENT RECEIVED username_set:', n);
             setUsername(n);
             setIsUsernameSet(true);
             setError('');
             setUsernameInput('');
         });
         socket.on('username_error', (m) => { setError(m); setIsUsernameSet(false); });
-        socket.on('error_message', (m) => { setError(`Erreur: ${m}`); console.error(m); }); // Afficher l'erreur venant du serveur
+        socket.on('error_message', (m) => { setError(`Erreur: ${m}`); console.error(m); });
 
         socket.on('update_table_list', setTables);
         socket.on('update_active_table', (d) => { console.log('Active table update:', d); setActiveTableDetails(d); setCurrentTableId(d?.id); setError(''); });
@@ -81,17 +97,25 @@ function App() {
 
         socket.on('chat_message', (m) => { setMessages((p) => [...p, m]); });
 
-        return () => { socket.disconnect(); console.log('Socket cleanup'); };
-    }, []);
+        // --- Fonction de nettoyage ---
+        // Sera appelée quand le composant est démonté ou avant la prochaine exécution de l'effet
+        // (ici, seulement au démontage car le tableau de dépendances est vide)
+        return () => {
+            if (socket) { // Vérifier si socket a bien été initialisé
+               socket.disconnect();
+               console.log('Socket cleanup');
+            }
+        };
+    }, []); // Le tableau de dépendances vide [] signifie que cet effet ne s'exécute qu'une fois au montage et se nettoie au démontage.
 
     // --- Handlers ---
     const handleUsernameSubmit = (e) => {
         e.preventDefault();
         setError('');
         const trimmedUsername = usernameInput.trim();
-        console.log(`handleUsernameSubmit: Trying with username='${trimmedUsername}', isConnected=${isConnected}, socketRef=${socketRef.current ? 'exists' : 'null'}`); // Log de débogage
+        console.log(`handleUsernameSubmit: Trying with username='${trimmedUsername}', isConnected=${isConnected}, socketRef=${socketRef.current ? 'exists' : 'null'}`);
         if (trimmedUsername && socketRef.current && isConnected) {
-            console.log('>>> CLIENT EMITTING set_username:', trimmedUsername); // Log avant l'émission
+            console.log('>>> CLIENT EMITTING set_username:', trimmedUsername);
             socketRef.current.emit('set_username', trimmedUsername);
         } else if (!trimmedUsername) {
             setError('Veuillez entrer un pseudo.');
