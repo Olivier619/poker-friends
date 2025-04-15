@@ -1,0 +1,492 @@
+/* client/src/App.css */
+.App {
+  text-align: center;
+  padding: 20px;
+  font-family: sans-serif;
+  max-width: 1000px; /* Limite la largeur pour une meilleure lisibilité */
+  margin: 0 auto; /* Centre l'application */
+}
+
+.username-form, .message-form {
+  margin-top: 15px;
+  display: flex; /* Aligner input et bouton */
+  justify-content: center; /* Centrer horizontalement */
+  align-items: center; /* Aligner verticalement */
+  gap: 10px; /* Espace entre input et bouton */
+}
+
+input[type="text"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+button {
+  padding: 10px 15px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.chat-box {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-top: 30px;
+  max-width: 700px; /* Largeur max du chat */
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.chat-box h2 {
+  margin-top: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.messages {
+  height: 350px; /* Hauteur fixe pour le scroll */
+  overflow-y: auto; /* Activer le scroll vertical */
+  border: 1px solid #eee;
+  margin-bottom: 15px;
+  padding: 10px;
+  text-align: left;
+  background-color: white;
+  border-radius: 4px;
+  display: flex; /* Permet au contenu de pousser vers le bas */
+  flex-direction: column; /* Empile les messages verticalement */
+}
+
+.messages p { /* Styles de base pour tous les messages */
+    margin: 8px 0;
+    word-wrap: break-word; /* Coupe les mots longs */
+    line-height: 1.4;
+}
+
+.system-message {
+  color: #666;
+  font-style: italic;
+  text-align: center; /* Centrer les messages système */
+  font-size: 0.9em;
+}
+
+.system-error-message {
+  color: #dc3545; /* Rouge Bootstrap pour erreur */
+  font-style: italic;
+  font-weight: bold;
+  text-align: center;
+  font-size: 0.9em;
+}
+
+.user-message {
+  margin: 5px 0;
+}
+
+.user-message strong { /* Style pour le nom d'utilisateur */
+    color: #0056b3; /* Bleu un peu plus foncé */
+}
+
+/* Espace vide à la fin pour le scrollIntoView */
+.messages div:last-child {
+  margin-top: auto;
+}
+
+.game-table {
+  margin-top: 40px;
+  border: 2px solid #28a745; /* Bordure verte pour la table */
+  padding: 20px;
+  background-color: #e9f5ec; /* Fond vert très clair */
+  border-radius: 8px;
+}
+
+.game-table h2 {
+    margin-top: 0;
+    color: #155724; /* Vert foncé pour le titre */
+}
+/* client/src/App.css - Ajouts pour le Lobby et Création de Table */
+
+.main-content {
+  display: flex; /* Optionnel: pour mettre lobby et chat côte à côte plus tard */
+  flex-direction: column; /* Par défaut, l'un sous l'autre */
+  gap: 30px; /* Espace entre les sections */
+}
+
+.lobby {
+  border: 1px solid #007bff; /* Bordure bleue pour le lobby */
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #e7f3ff; /* Fond bleu très clair */
+}
+
+.lobby h2, .lobby h3 {
+  margin-top: 0;
+  color: #0056b3; /* Bleu foncé */
+  border-bottom: 1px solid #bee5eb;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.table-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px; /* Espace avant le formulaire de création */
+}
+
+.table-list li {
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  display: flex; /* Aligner le texte et le bouton */
+  justify-content: space-between; /* Mettre le bouton à droite */
+  align-items: center; /* Centrer verticalement */
+}
+
+.table-list li span {
+  font-weight: bold;
+}
+
+.table-list button {
+  padding: 5px 10px; /* Bouton plus petit */
+  font-size: 0.9rem;
+  background-color: #28a745; /* Vert pour rejoindre */
+}
+.table-list button:hover:not(:disabled) {
+    background-color: #218838;
+}
+.table-list button:disabled {
+    background-color: #ccc;
+}
+
+
+.create-table-form {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px dashed #ccc; /* Séparateur visuel */
+}
+
+.create-table-form form div {
+  margin-bottom: 15px; /* Espace entre les lignes du formulaire */
+  text-align: left; /* Aligner labels et inputs à gauche */
+  max-width: 400px; /* Limiter largeur du formulaire */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.create-table-form label {
+  display: inline-block; /* Permet de définir une largeur */
+  width: 140px; /* Aligner les inputs */
+  margin-right: 10px;
+  text-align: right;
+  font-weight: bold;
+}
+
+.create-table-form input[type="text"],
+.create-table-form input[type="number"] {
+  width: 200px; /* Largeur fixe pour les inputs */
+  padding: 8px;
+}
+
+.create-table-form button {
+  display: block; /* Bouton sur sa propre ligne */
+  margin: 20px auto 0 auto; /* Centrer le bouton */
+}
+
+/* Optionnel: Layout côte à côte pour écrans larges */
+@media (min-width: 900px) {
+  .main-content {
+    flex-direction: row; /* Lobby et Chat côte à côte */
+    align-items: flex-start; /* Aligner en haut */
+  }
+  .lobby {
+    flex: 1; /* Le lobby prend l'espace disponible */
+  }
+  .chat-box {
+    flex: 0 0 350px; /* Largeur fixe pour le chat */
+    margin-top: 0; /* Réinitialiser marge si côte à côte */
+  }
+}
+
+/* client/src/App.css - Ajouts pour la Table Active */
+
+.game-table-active {
+  border: 2px solid #28a745; /* Bordure verte */
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #e9f5ec; /* Fond vert très clair */
+  flex-grow: 1; /* Prend plus de place si en mode flex row */
+}
+
+.game-table-active h2, .game-table-active h3 {
+  margin-top: 0;
+  color: #155724; /* Vert foncé */
+  border-bottom: 1px solid #c3e6cb;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.player-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.player-list li {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  padding: 8px 12px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+}
+
+.player-list li strong {
+    color: #0056b3;
+}
+
+.player-list li span { /* Pour le "(Vous)" */
+    color: #28a745;
+    font-weight: bold;
+}
+
+.game-actions {
+  margin-top: 20px;
+  padding: 15px;
+  border-top: 1px dashed #ccc;
+  border-bottom: 1px dashed #ccc;
+  margin-bottom: 20px;
+  min-height: 50px; /* Espace pour les futurs boutons */
+  background-color: #f0f0f0;
+}
+
+.leave-button {
+  background-color: #dc3545; /* Rouge pour quitter */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 10px;
+}
+
+.leave-button:hover {
+  background-color: #c82333;
+}
+
+/* client/src/App.css - Ajouts pour les cartes et joueurs */
+
+.card {
+  display: inline-block;
+  border: 1px solid #333;
+  border-radius: 5px;
+  width: 50px;
+  height: 70px;
+  margin: 2px;
+  background-color: white;
+  position: relative;
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+.card.back {
+  background-color: #b00; /* Dos rouge */
+  background-image: linear-gradient(135deg, #f00 25%, transparent 25%),
+                    linear-gradient(225deg, #f00 25%, transparent 25%),
+                    linear-gradient(45deg, #f00 25%, transparent 25%),
+                    linear-gradient(315deg, #f00 25%, #b00 25%);
+  background-position: 5px 0, 5px 0, 0 0, 0 0;
+  background-size: 10px 10px;
+  background-repeat: repeat;
+}
+.card.empty { border: 1px dashed #ccc; background: #f9f9f9; box-shadow: none; }
+
+.card .rank { position: absolute; top: 2px; left: 4px; }
+.card .suit { position: absolute; bottom: 2px; right: 4px; font-size: 20px; }
+.card.color-red { color: red; }
+.card.color-black { color: black; }
+
+.community-cards {
+  min-height: 80px; /* Espace même si vide */
+  background-color: #d4edda; /* Vert plus clair */
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.community-cards h3 { margin-top: 0; margin-bottom: 5px; font-size: 1em; color: #155724;}
+
+.player-list li {
+  display: flex;
+  justify-content: space-between; /* Espace entre infos et cartes */
+  align-items: center; /* Centrer verticalement */
+  transition: opacity 0.3s ease; /* Pour griser si fold */
+}
+
+.player-list li.folded {
+  opacity: 0.5; /* Griser le joueur */
+  background-color: #e9ecef;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column; /* Empiler les infos */
+  text-align: left;
+  flex-grow: 1; /* Prendre l'espace dispo */
+}
+.player-info span { font-size: 0.9em; }
+.player-info strong { font-size: 1.1em; margin-right: 5px;}
+
+.player-hole-cards {
+  min-width: 110px; /* Espace pour 2 cartes + marges */
+  text-align: right;
+}
+.player-hole-cards.empty { min-width: 0; } /* Pas besoin d'espace si vide */
+
+/* client/src/App.css - Ajouts pour tour de jeu et mises */
+
+.player-list li.current-turn {
+  border: 2px solid #007bff; /* Bordure bleue épaisse */
+  background-color: #e7f3ff; /* Fond bleu clair */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.player-info span { /* Style de base pour les infos */
+    display: block; /* Met chaque info sur sa ligne */
+    margin-bottom: 2px;
+}
+
+.player-info span:last-child {
+    margin-bottom: 0;
+}
+
+.player-bet {
+  font-weight: bold;
+  color: #2a9d8f; /* Couleur sarcelle pour la mise */
+  background-color: #e0f2f1;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.85em;
+  display: inline-block; /* Pour que le background s'ajuste */
+}
+
+.game-actions {
+  border: 2px solid #ffc107; /* Bordure jaune pour actions */
+  background-color: #fffbeb; /* Fond jaune très clair */
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 5px;
+}
+
+.game-actions h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.game-actions button {
+  margin: 5px;
+  padding: 8px 12px;
+}
+
+/* client/src/App.css - Ajout pour bouton Démarrer */
+
+.start-game-section {
+  text-align: center;
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #d1ecf1; /* Fond bleu-vert clair */
+  border: 1px solid #bee5eb;
+  border-radius: 5px;
+}
+
+.start-game-button {
+  padding: 12px 25px;
+  font-size: 1.1em;
+  background-color: #28a745; /* Vert */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.start-game-button:hover {
+  background-color: #218838;
+}
+
+/* client/src/App.css - Ajouts pour input de mise/relance */
+
+.bet-raise-section {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+  display: flex; /* Aligner input et boutons */
+  align-items: center;
+  gap: 10px; /* Espace entre éléments */
+  justify-content: center; /* Centrer horizontalement */
+}
+
+.bet-input {
+  width: 80px; /* Largeur pour le montant */
+  padding: 8px;
+  text-align: right;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.game-actions button:disabled {
+  background-color: #6c757d; /* Gris pour désactivé */
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* client/src/App.css - Ajouts All-in et Showdown */
+
+.allin-button {
+  background-color: #dc3545; /* Rouge */
+  color: white;
+  font-weight: bold;
+  margin-left: 15px;
+}
+.allin-button:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.player-list li.winner {
+  border-left: 5px solid gold; /* Marquer le gagnant */
+  background-color: #fff3cd; /* Fond jaune clair */
+}
+.player-list li.winner strong {
+  color: #856404; /* Brun doré */
+}
+
+.player-hand-name {
+  font-style: italic;
+  color: #555;
+  font-size: 0.9em;
+  margin-left: 10px;
+}
+
+.showdown-results { /* Style déjà ajouté */ }
