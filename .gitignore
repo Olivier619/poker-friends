@@ -1,18 +1,23 @@
-# Ignorer les dépendances Node
+# Ignorer les dossiers de dépendances Node.js
 node_modules/
-server/node_modules/
-client/node_modules/
 
-# Ignorer les fichiers d'environnement (s'ils contiennent des secrets)
-.env
-*.env
+# Ignorer les dossiers de build (React par défaut)
+client/build/
+server/build/ # Si vous buildz le serveur
 
-# Autres fichiers (logs, builds temporaires, etc.)
-npm-debug.log
+# Ignorer les fichiers de débogage ou temporaires
 *.log
-build/
-dist/
+*.tmp
+.DS_Store # Fichiers Mac
 
-# Fichiers système macOS/Windows
-.DS_Store
-Thumbs.db
+# Ignorer les fichiers d'environnement locaux (potentiellement sensibles)
+.env
+.env.local
+.env.*.local
+
+# Ignorer les caches de l'éditeur (VS Code par exemple)
+.vscode/
+
+# Autres dossiers de build courants si utilisés
+dist/
+out/

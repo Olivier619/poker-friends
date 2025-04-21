@@ -1,12 +1,35 @@
 /* client/src/App.css */
+
+/* Styles généraux du corps de l'application */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #282c34; /* Fond sombre appliqué au body */
+    color: #f0f0f0; /* Texte clair par default */
+    font-family: sans-serif;
+}
+
 .App {
   text-align: center;
   padding: 20px;
-  font-family: sans-serif;
   max-width: 1000px; /* Limite la largeur pour une meilleure lisibilité */
   margin: 0 auto; /* Centre l'application */
+  min-height: 100vh; /* Hauteur minimale pour occuper toute la vue */
+  box-sizing: border-box; /* Inclut padding et border dans la largeur/hauteur */
 }
 
+.App h1 {
+    color: #61dafb; /* Couleur React blue */
+    margin-bottom: 10px;
+}
+
+.App p {
+    margin-top: 0;
+    font-size: 0.9em;
+    color: #bbb;
+}
+
+/* Styles pour les formulaires */
 .username-form, .message-form {
   margin-top: 15px;
   display: flex; /* Aligner input et bouton */
@@ -15,83 +38,110 @@
   gap: 10px; /* Espace entre input et bouton */
 }
 
-input[type="text"] {
+.username-form h2 {
+    color: #f0f0f0;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+
+input[type="text"],
+input[type="number"] {
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #555; /* Bordure foncée */
   border-radius: 4px;
   font-size: 1rem;
+  background-color: #3a3e47; /* Fond input foncé */
+  color: #f0f0f0; /* Texte input clair */
+  box-sizing: border-box;
 }
+
+input[type="text"]::placeholder,
+input[type="number"]::placeholder {
+    color: #aaa; /* Placeholder plus clair */
+}
+
 
 button {
   padding: 10px 15px;
   cursor: pointer;
-  background-color: #007bff;
+  background-color: #007bff; /* Bleu standard */
   color: white;
   border: none;
   border-radius: 4px;
   font-size: 1rem;
+  transition: background-color 0.2s ease; /* Animation au survol */
 }
 
 button:disabled {
-  background-color: #ccc;
+  background-color: #444; /* Gris foncé pour désactivé */
   cursor: not-allowed;
+  opacity: 0.65; /* Rendre légèrement transparent */
 }
 
 button:hover:not(:disabled) {
-  background-color: #0056b3;
+  background-color: #0056b3; /* Bleu plus foncé au survol */
 }
 
 .error-message {
-  color: red;
+  color: #dc3545; /* Rouge vif */
   font-weight: bold;
   margin-top: 10px;
+  background-color: rgba(220, 53, 69, 0.2); /* Fond rouge léger */
+  padding: 8px;
+  border-radius: 4px;
 }
 
+/* Styles du Chat */
 .chat-box {
-  border: 1px solid #ccc;
+  border: 1px solid #555; /* Bordure foncée */
   padding: 15px;
   margin-top: 30px;
   max-width: 700px; /* Largeur max du chat */
   margin-left: auto;
   margin-right: auto;
-  background-color: #f9f9f9;
+  background-color: #3a3e47; /* Fond foncé */
   border-radius: 8px;
+  display: flex; /* Utilise flexbox pour mettre messages et form en colonne */
+  flex-direction: column;
 }
 
 .chat-box h2 {
   margin-top: 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #555; /* Ligne de séparation foncée */
   padding-bottom: 10px;
+  color: #f0f0f0;
 }
 
 .messages {
   height: 350px; /* Hauteur fixe pour le scroll */
   overflow-y: auto; /* Activer le scroll vertical */
-  border: 1px solid #eee;
+  border: 1px solid #555;
   margin-bottom: 15px;
   padding: 10px;
   text-align: left;
-  background-color: white;
+  background-color: #282c34; /* Fond de chat encore plus foncé */
   border-radius: 4px;
   display: flex; /* Permet au contenu de pousser vers le bas */
   flex-direction: column; /* Empile les messages verticalement */
+  color: #ccc; /* Texte clair pour les messages */
 }
 
-.messages p { /* Styles de base pour tous les messages */
+.messages p {
     margin: 8px 0;
     word-wrap: break-word; /* Coupe les mots longs */
     line-height: 1.4;
 }
 
 .system-message {
-  color: #666;
+  color: #aaa; /* Gris clair pour les messages système */
   font-style: italic;
   text-align: center; /* Centrer les messages système */
   font-size: 0.9em;
 }
 
 .system-error-message {
-  color: #dc3545; /* Rouge Bootstrap pour erreur */
+  color: #dc3545; /* Rouge vif pour les erreurs système */
   font-style: italic;
   font-weight: bold;
   text-align: center;
@@ -103,7 +153,7 @@ button:hover:not(:disabled) {
 }
 
 .user-message strong { /* Style pour le nom d'utilisateur */
-    color: #0056b3; /* Bleu un peu plus foncé */
+    color: #61dafb; /* Couleur React */
 }
 
 /* Espace vide à la fin pour le scrollIntoView */
@@ -111,37 +161,31 @@ button:hover:not(:disabled) {
   margin-top: auto;
 }
 
-.game-table {
-  margin-top: 40px;
-  border: 2px solid #28a745; /* Bordure verte pour la table */
-  padding: 20px;
-  background-color: #e9f5ec; /* Fond vert très clair */
-  border-radius: 8px;
+.chat-box .message-form input {
+    flex-grow: 1; /* L'input prend l'espace restant */
 }
 
-.game-table h2 {
-    margin-top: 0;
-    color: #155724; /* Vert foncé pour le titre */
-}
-/* client/src/App.css - Ajouts pour le Lobby et Création de Table */
+
+/* Styles du Lobby et Création de Table */
 
 .main-content {
   display: flex; /* Optionnel: pour mettre lobby et chat côte à côte plus tard */
-  flex-direction: column; /* Par défaut, l'un sous l'autre */
+  flex-direction: column; /* Par default, l'un sous l'autre */
   gap: 30px; /* Espace entre les sections */
+  margin-top: 20px;
 }
 
 .lobby {
-  border: 1px solid #007bff; /* Bordure bleue pour le lobby */
+  border: 1px solid #61dafb; /* Bordure bleue/cyan */
   padding: 20px;
   border-radius: 8px;
-  background-color: #e7f3ff; /* Fond bleu très clair */
+  background-color: #3a3e47; /* Fond foncé */
 }
 
 .lobby h2, .lobby h3 {
   margin-top: 0;
-  color: #0056b3; /* Bleu foncé */
-  border-bottom: 1px solid #bee5eb;
+  color: #61dafb; /* Titres bleus/cyan */
+  border-bottom: 1px solid #555;
   padding-bottom: 10px;
   margin-bottom: 15px;
 }
@@ -153,14 +197,15 @@ button:hover:not(:disabled) {
 }
 
 .table-list li {
-  background-color: white;
-  border: 1px solid #ddd;
+  background-color: #282c34; /* Fond de liste foncé */
+  border: 1px solid #555;
   padding: 10px 15px;
   margin-bottom: 10px;
   border-radius: 4px;
   display: flex; /* Aligner le texte et le bouton */
   justify-content: space-between; /* Mettre le bouton à droite */
   align-items: center; /* Centrer verticalement */
+  color: #f0f0f0; /* Texte clair */
 }
 
 .table-list li span {
@@ -176,14 +221,14 @@ button:hover:not(:disabled) {
     background-color: #218838;
 }
 .table-list button:disabled {
-    background-color: #ccc;
+    background-color: #444;
 }
 
 
 .create-table-form {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px dashed #ccc; /* Séparateur visuel */
+  border-top: 1px dashed #555; /* Séparateur visuel foncé */
 }
 
 .create-table-form form div {
@@ -200,12 +245,12 @@ button:hover:not(:disabled) {
   margin-right: 10px;
   text-align: right;
   font-weight: bold;
+  color: #f0f0f0;
 }
 
 .create-table-form input[type="text"],
 .create-table-form input[type="number"] {
   width: 200px; /* Largeur fixe pour les inputs */
-  padding: 8px;
 }
 
 .create-table-form button {
@@ -226,24 +271,33 @@ button:hover:not(:disabled) {
     flex: 0 0 350px; /* Largeur fixe pour le chat */
     margin-top: 0; /* Réinitialiser marge si côte à côte */
   }
+   /* Assure que la table prend la place si en mode côte à côte et actif */
+  .game-table-active {
+    flex: 1;
+    margin-right: 30px; /* Espace entre table et chat */
+  }
 }
 
-/* client/src/App.css - Ajouts pour la Table Active */
+/* Styles de la Table Active */
 
 .game-table-active {
   border: 2px solid #28a745; /* Bordure verte */
   padding: 20px;
   border-radius: 8px;
-  background-color: #e9f5ec; /* Fond vert très clair */
+  background-color: #3a3e47; /* Fond foncé similaire au chat */
   flex-grow: 1; /* Prend plus de place si en mode flex row */
 }
 
 .game-table-active h2, .game-table-active h3 {
   margin-top: 0;
-  color: #155724; /* Vert foncé */
-  border-bottom: 1px solid #c3e6cb;
+  color: #28a745; /* Titres verts */
+  border-bottom: 1px solid #555;
   padding-bottom: 10px;
   margin-bottom: 15px;
+}
+
+.game-table-active p { /* Styles génériques dans la table */
+    color: #ccc;
 }
 
 .player-list {
@@ -253,61 +307,90 @@ button:hover:not(:disabled) {
 }
 
 .player-list li {
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
+  background-color: #282c34; /* Fond joueur foncé */
+  border: 1px solid #555;
   padding: 8px 12px;
-  margin-bottom: 5px;
+  margin-bottom: 8px; /* Plus d'espace entre joueurs */
   border-radius: 4px;
+  color: #f0f0f0;
+  display: flex;
+  justify-content: space-between; /* Espace entre infos et cartes */
+  align-items: center; /* Centrer verticalement */
+  transition: opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease; /* Transitions pour les états */
 }
 
 .player-list li strong {
-    color: #0056b3;
+    color: #61dafb; /* Pseudo en couleur React */
 }
 
 .player-list li span { /* Pour le "(Vous)" */
-    color: #28a745;
+    color: #28a745; /* Vert pour "Vous" et (D) */
     font-weight: bold;
 }
 
-.game-actions {
-  margin-top: 20px;
-  padding: 15px;
-  border-top: 1px dashed #ccc;
-  border-bottom: 1px dashed #ccc;
-  margin-bottom: 20px;
-  min-height: 50px; /* Espace pour les futurs boutons */
-  background-color: #f0f0f0;
+.player-list li.folded {
+  opacity: 0.6; /* Griser le joueur */
+  background-color: #444; /* Fond plus gris */
+}
+.player-list li.all-in {
+   border-color: #ffc107; /* Bordure jaune/orange */
+   box-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
+}
+.player-list li.sitting-out {
+    font-style: italic;
+    opacity: 0.8;
+    background-color: #333;
+    border-color: #444;
+    color: #bbb;
+}
+.player-list li.sitting-out strong {
+    color: #999;
 }
 
-.leave-button {
-  background-color: #dc3545; /* Rouge pour quitter */
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  margin-top: 10px;
+
+.player-list li.current-turn {
+  border: 2px solid #ffc107; /* Bordure jaune/orange pour le tour */
+  background-color: #5a4b30; /* Fond légèrement orangé */
+  box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
 }
 
-.leave-button:hover {
-  background-color: #c82333;
-}
 
-/* client/src/App.css - Ajouts pour les cartes et joueurs */
+.player-info {
+  display: flex;
+  flex-direction: column; /* Empiler les infos */
+  text-align: left;
+  flex-grow: 1; /* Prendre l'espace dispo */
+  margin-right: 10px; /* Espace entre info et cartes */
+}
+.player-info span { font-size: 0.9em; }
+.player-info strong { font-size: 1.1em; margin-right: 5px;}
+
+.player-hole-cards {
+  min-width: 110px; /* Espace pour 2 cartes + marges */
+  display: flex; /* Permet aux cartes de s'aligner */
+  justify-content: flex-end; /* Aligne les cartes à droite */
+}
+.player-hole-cards .card {
+    margin-left: 4px; /* Espace entre les cartes */
+}
+.player-hole-cards.empty { min-width: 0; } /* Pas besoin d'espace si vide */
+
+
+/* Styles des Cartes */
 
 .card {
   display: inline-block;
   border: 1px solid #333;
   border-radius: 5px;
-  width: 50px;
-  height: 70px;
-  margin: 2px;
+  width: 45px; /* Taille légèrement réduite */
+  height: 65px;
+  margin: 2px 0; /* Ajuste les marges */
   background-color: white;
   position: relative;
-  font-size: 18px;
+  font-size: 16px; /* Taille de police ajustée */
   font-weight: bold;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.4); /* Ombre plus visible sur fond sombre */
+  color: black; /* Couleur par default du texte */
 }
 
 .card.back {
@@ -319,83 +402,46 @@ button:hover:not(:disabled) {
   background-position: 5px 0, 5px 0, 0 0, 0 0;
   background-size: 10px 10px;
   background-repeat: repeat;
+  color: transparent; /* Cache le texte sur le dos */
 }
-.card.empty { border: 1px dashed #ccc; background: #f9f9f9; box-shadow: none; }
+.card.empty { border: 1px dashed #555; background: #4a4e57; box-shadow: none; } /* Vide plus sombre */
 
 .card .rank { position: absolute; top: 2px; left: 4px; }
-.card .suit { position: absolute; bottom: 2px; right: 4px; font-size: 20px; }
-.card.color-red { color: red; }
-.card.color-black { color: black; }
+.card .suit { position: absolute; bottom: 2px; right: 4px; font-size: 18px; /* Taille de police de la couleur */ }
+.card.color-red { color: #dc3545; } /* Rouge vif pour les coeurs/carreaux */
+.card.color-black { color: #282c34; } /* Noir très foncé pour les piques/trèfles */
 
+
+/* Styles des Cartes Communes */
 .community-cards {
   min-height: 80px; /* Espace même si vide */
-  background-color: #d4edda; /* Vert plus clair */
+  background-color: #4a4e57; /* Fond légèrement plus clair que la table */
   padding: 10px;
   border-radius: 5px;
   margin-bottom: 20px;
   text-align: center;
+  border: 1px solid #555;
 }
-.community-cards h3 { margin-top: 0; margin-bottom: 5px; font-size: 1em; color: #155724;}
-
-.player-list li {
-  display: flex;
-  justify-content: space-between; /* Espace entre infos et cartes */
-  align-items: center; /* Centrer verticalement */
-  transition: opacity 0.3s ease; /* Pour griser si fold */
+.community-cards h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 1em;
+    color: #ccc; /* Texte clair */
 }
-
-.player-list li.folded {
-  opacity: 0.5; /* Griser le joueur */
-  background-color: #e9ecef;
+.community-cards .card {
+    margin: 2px 5px; /* Plus d'espace entre les cartes communes */
 }
 
-.player-info {
-  display: flex;
-  flex-direction: column; /* Empiler les infos */
-  text-align: left;
-  flex-grow: 1; /* Prendre l'espace dispo */
-}
-.player-info span { font-size: 0.9em; }
-.player-info strong { font-size: 1.1em; margin-right: 5px;}
 
-.player-hole-cards {
-  min-width: 110px; /* Espace pour 2 cartes + marges */
-  text-align: right;
-}
-.player-hole-cards.empty { min-width: 0; } /* Pas besoin d'espace si vide */
-
-/* client/src/App.css - Ajouts pour tour de jeu et mises */
-
-.player-list li.current-turn {
-  border: 2px solid #007bff; /* Bordure bleue épaisse */
-  background-color: #e7f3ff; /* Fond bleu clair */
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
-
-.player-info span { /* Style de base pour les infos */
-    display: block; /* Met chaque info sur sa ligne */
-    margin-bottom: 2px;
-}
-
-.player-info span:last-child {
-    margin-bottom: 0;
-}
-
-.player-bet {
-  font-weight: bold;
-  color: #2a9d8f; /* Couleur sarcelle pour la mise */
-  background-color: #e0f2f1;
-  padding: 1px 4px;
-  border-radius: 3px;
-  font-size: 0.85em;
-  display: inline-block; /* Pour que le background s'ajuste */
-}
-
+/* Styles des Actions de Jeu */
 .game-actions {
-  border: 2px solid #ffc107; /* Bordure jaune pour actions */
-  background-color: #fffbeb; /* Fond jaune très clair */
-  padding: 15px;
   margin-top: 20px;
+  padding: 15px;
+  border-top: 1px dashed #555;
+  border-bottom: 1px dashed #555;
+  margin-bottom: 20px;
+  min-height: 50px; /* Espace */
+  background-color: #3a3e47; /* Fond foncé */
   border-radius: 5px;
 }
 
@@ -403,21 +449,52 @@ button:hover:not(:disabled) {
   margin-top: 0;
   margin-bottom: 15px;
   text-align: center;
+  color: #ffc107; /* Orange pour le titre des actions */
 }
+
+.game-actions p { /* Message à l'utilisateur s'il ne peut pas agir */
+    color: #bbb;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
 
 .game-actions button {
   margin: 5px;
   padding: 8px 12px;
 }
 
-/* client/src/App.css - Ajout pour bouton Démarrer */
+/* Styles pour l'input de mise/relance */
+.bet-raise-section {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #555;
+  display: flex; /* Aligner input et boutons */
+  align-items: center;
+  gap: 10px; /* Espace entre éléments */
+  justify-content: center; /* Centrer horizontalement */
+  flex-wrap: wrap; /* Permettre aux éléments de passer à la ligne si l'espace est limité */
+}
 
+.bet-input {
+  width: 90px; /* Largeur pour le montant */
+  padding: 8px;
+  text-align: right;
+}
+
+.game-actions button:disabled {
+  background-color: #6c757d; /* Gris pour désactivé */
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* Styles pour le bouton Démarrer Partie */
 .start-game-section {
   text-align: center;
   margin: 20px 0;
   padding: 15px;
-  background-color: #d1ecf1; /* Fond bleu-vert clair */
-  border: 1px solid #bee5eb;
+  background-color: #4a4e57; /* Fond foncé */
+  border: 1px solid #555;
   border-radius: 5px;
 }
 
@@ -432,61 +509,309 @@ button:hover:not(:disabled) {
   transition: background-color 0.2s ease;
 }
 
-.start-game-button:hover {
+.start-game-button:hover:not(:disabled) {
   background-color: #218838;
 }
 
-/* client/src/App.css - Ajouts pour input de mise/relance */
-
-.bet-raise-section {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #eee;
-  display: flex; /* Aligner input et boutons */
-  align-items: center;
-  gap: 10px; /* Espace entre éléments */
-  justify-content: center; /* Centrer horizontalement */
-}
-
-.bet-input {
-  width: 80px; /* Largeur pour le montant */
-  padding: 8px;
-  text-align: right;
-  border: 1px solid #ccc;
+/* Styles pour le bouton Quitter */
+.leave-button {
+  background-color: #dc3545; /* Rouge pour quitter */
+  color: white;
+  padding: 10px 15px;
+  border: none;
   border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 15px; /* Plus d'espace au-dessus */
 }
 
-.game-actions button:disabled {
-  background-color: #6c757d; /* Gris pour désactivé */
-  cursor: not-allowed;
-  opacity: 0.65;
+.leave-button:hover:not(:disabled) {
+  background-color: #c82333;
 }
 
-/* client/src/App.css - Ajouts All-in et Showdown */
+/* Styles pour le message de mise du joueur */
+.player-bet {
+  font-weight: bold;
+  color: #2a9d8f; /* Couleur sarcelle pour la mise */
+  background-color: #4a5a5a; /* Fond foncé */
+  padding: 1px 6px; /* Ajuste le padding */
+  border-radius: 3px;
+  font-size: 0.85em;
+  display: inline-block; /* Pour que le background s'ajuste */
+  margin-top: 4px; /* Espace au-dessus */
+}
 
+/* Styles pour marquer les gagnants dans la liste des joueurs */
+.player-list li.winner {
+  border-left: 5px solid gold; /* Bordure dorée sur la gauche */
+  background-color: #5a5030; /* Fond légèrement doré/brun */
+  transition: background-color 0.5s ease, border-left 0.5s ease; /* Ajout de transition */
+}
+.player-list li.winner strong {
+  color: gold; /* Pseudo en doré */
+}
+.player-list li.winner .player-info span {
+    color: #ccc; /* Autres infos en gris clair */
+}
+
+
+/* Styles pour afficher le nom de la main gagnante à côté du nom du joueur */
+.player-hand-name {
+  font-style: italic;
+  color: #ccc; /* Texte gris clair */
+  font-size: 0.9em;
+  margin-left: 10px;
+  display: inline-block;
+  background-color: rgba(255, 193, 7, 0.1); /* Léger fond jaune translucide */
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+
+/* NOUVEAUX STYLES POUR LA SECTION RÉSULTATS DU SHOWDOWN */
+.showdown-results {
+  margin-top: 20px;
+  padding: 15px;
+  border: 2px solid #ffc107; /* Bordure jaune pour un aspect "événement spécial" */
+  background-color: #4a4e57; /* Fond foncé similaire aux cartes communes */
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 20px; /* Espace sous les résultats */
+}
+
+.showdown-results h3 {
+  margin-top: 0;
+  color: #ffc107; /* Couleur jaune/orange pour le titre */
+  font-size: 1.3em;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #555; /* Séparateur léger */
+  padding-bottom: 8px;
+}
+
+.showdown-results p {
+  margin: 8px 0;
+  font-size: 1.1em;
+  color: #f0f0f0; /* Texte clair */
+}
+
+.showdown-results strong {
+   color: gold; /* Nom de la main gagnante en doré */
+   font-weight: bold;
+}
+
+/* Styles pour la section "Prochaine Main" après le showdown - SUPPRIMÉS */
+/*
+.next-hand-section {
+    text-align: center;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #4a4e57;
+    border: 1px solid #555;
+    border-radius: 5px;
+    color: #ccc;
+    font-size: 0.9em;
+}
+*/
+
+/* AJOUT pour le bouton All-in */
 .allin-button {
   background-color: #dc3545; /* Rouge */
   color: white;
   font-weight: bold;
-  margin-left: 15px;
+  padding: 8px 12px; /* Similaire aux autres boutons d'action */
 }
 .allin-button:hover:not(:disabled) {
   background-color: #c82333;
 }
+/* client/src/App.css */
 
+/* ... (existing styles) ... */
+
+/* --- NEW STYLES FOR SHOWDOWN --- */
+
+/* Showdown Results Section */
+.showdown-results {
+  margin-top: 20px;
+  padding: 15px;
+  border: 2px solid #ffc107; /* Orange/Yellow border */
+  background-color: #4a4e57;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.showdown-results h3 {
+  margin-top: 0;
+  color: #ffc107;
+  font-size: 1.3em;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #555;
+  padding-bottom: 8px;
+}
+
+.showdown-results p {
+  margin: 8px 0;
+  font-size: 1.1em;
+  color: #f0f0f0;
+}
+
+.showdown-results strong {
+   color: gold;
+   font-weight: bold;
+}
+
+/* Showdown Reveal Order List */
+.showdown-reveal-order {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed #666; /* Separator */
+    text-align: left; /* Align list left */
+}
+
+.showdown-reveal-order h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #ccc; /* Lighter grey */
+    font-size: 1em;
+    text-align: center; /* Center title */
+}
+
+.showdown-reveal-order ol {
+    list-style: none; /* No default numbers */
+    counter-reset: reveal-counter; /* Start counter */
+    padding: 0;
+    margin: 0;
+}
+
+.showdown-reveal-order li {
+    counter-increment: reveal-counter; /* Increment counter for each list item */
+    margin-bottom: 10px;
+    padding-left: 30px; /* Space for custom number */
+    position: relative; /* For absolute positioning of counter */
+    background-color: #3a3e47; /* Darker background for list item */
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 10px; /* Adjust padding */
+    display: flex; /* Use flex to align info and cards */
+    align-items: center; /* Center vertically */
+    flex-wrap: wrap; /* Allow content to wrap */
+}
+
+.showdown-reveal-order li::before {
+    content: counter(reveal-counter) ". "; /* Display the counter */
+    position: absolute;
+    left: 5px; /* Position the number */
+    top: 10px; /* Align with text */
+    font-weight: bold;
+    color: #61dafb; /* Color the number */
+}
+
+.showdown-reveal-order li strong {
+    margin-right: 5px;
+    color: #f0f0f0; /* White/light grey for player name */
+}
+
+.showdown-reveal-order li span {
+    font-size: 0.9em; /* Smaller text for descriptions */
+    color: #ccc; /* Light grey for status/desc text */
+    margin-right: 10px; /* Space between elements */
+}
+
+.showdown-reveal-order li .player-hole-cards {
+    margin-left: auto; /* Push cards to the right */
+    flex-shrink: 0; /* Prevent cards from shrinking */
+    min-width: 90px; /* Ensure space for cards */
+}
+
+/* Style for mucked text */
+.mucked-text {
+    font-style: italic;
+    color: #aaa; /* Grey */
+}
+/* Style for hand name text */
+.hand-text {
+    color: #2a9d8f; /* Teal color */
+    font-weight: bold;
+}
+/* Style for winner text */
+.winner-text {
+    color: gold; /* Gold color */
+    font-weight: bold;
+}
+.winner-indicator {
+    color: gold;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+
+/* Style for small cards in showdown reveal */
+.showdown-reveal-order li .player-hole-cards.small-cards .card {
+    width: 30px; /* Smaller width */
+    height: 45px; /* Smaller height */
+    font-size: 12px; /* Smaller font */
+    border-radius: 3px; /* Smaller border-radius */
+    box-shadow: 0.5px 0.5px 2px rgba(0,0,0,0.3);
+}
+.showdown-reveal-order li .player-hole-cards.small-cards .card .rank { top: 1px; left: 2px; }
+.showdown-reveal-order li .player-hole-cards.small-cards .card .suit { bottom: 1px; right: 2px; font-size: 14px; }
+
+
+/* Style for the 'MUCK' card visual */
+.card.mucked {
+    background-color: #555; /* Dark grey */
+    color: #ddd; /* Lighter grey text */
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-weight: normal;
+    width: 45px; /* Match normal card size */
+    height: 65px;
+}
+.showdown-reveal-order li .player-hole-cards.small-cards .card.mucked {
+    width: 30px; /* Match small card size */
+    height: 45px;
+    font-size: 8px;
+}
+
+
+/* Styles for player list items during showdown */
+.player-list li.mucked {
+    opacity: 0.7; /* Slightly dim mucked players */
+    border-color: #777;
+}
 .player-list li.winner {
-  border-left: 5px solid gold; /* Marquer le gagnant */
-  background-color: #fff3cd; /* Fond jaune clair */
+  border-left-color: gold; /* Keep border color */
+  background-color: #4d452f; /* Slightly darker gold/brown background */
+  transition: background-color 0.5s ease, border-left 0.5s ease;
 }
 .player-list li.winner strong {
-  color: #856404; /* Brun doré */
+  color: gold;
+}
+.player-list li.winner .player-info span {
+    color: #ccc;
+}
+.player-list li .player-hand-name {
+    /* Ensure hand name is always inline in list view if visible */
+     display: inline-block;
+     margin-left: 10px;
 }
 
-.player-hand-name {
-  font-style: italic;
-  color: #555;
-  font-size: 0.9em;
-  margin-left: 10px;
+
+/* Add styling for tables in progress */
+.table-list li.table-in-progress {
+    border-left: 5px solid #ffc107; /* Orange indicator */
 }
 
-.showdown-results { /* Style déjà ajouté */ }
+/* Adjust input number step to allow decimals */
+input[type="number"] {
+    /* existing styles */
+    -moz-appearance: textfield; /* Remove default arrows in Firefox */
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none; /* Remove default arrows in Chrome/Safari */
+    margin: 0;
+}
