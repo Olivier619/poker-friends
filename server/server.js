@@ -14,7 +14,7 @@ const server = http.createServer(app); // Utilisez 'app' ici
 
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000", // Assurez-vous que cela correspond à l'URL de votre client React
+        origin: ["http://localhost:3000", "https://poker-friends-ruddy.vercel.app"], // <--- Autorise et local et Vercel
         methods: ["GET", "POST"]
     }
 });
