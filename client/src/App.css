@@ -815,3 +815,886 @@ input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none; /* Remove default arrows in Chrome/Safari */
     margin: 0;
 }
+/* client/src/App.css */
+
+/* General styles */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #282c34;
+  color: #f0f0f0;
+  font-family: sans-serif;
+  min-height: 100vh; /* Ensure body takes at least full viewport height */
+  display: flex; /* Use flexbox for basic layout of body */
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
+}
+
+.App {
+text-align: center;
+padding: 20px;
+max-width: 1200px; /* Increased max width to fit more content */
+margin: 0 auto;
+flex-grow: 1; /* App takes available space vertically */
+width: 100%; /* Use full width up to max-width */
+box-sizing: border-box;
+display: flex; /* Use flexbox for App content */
+flex-direction: column; /* Stack title, error, main content */
+align-items: center;
+gap: 20px; /* Space between sections */
+}
+
+.App h1 {
+  color: #61dafb;
+  margin-bottom: 10px;
+}
+
+.App p {
+  margin-top: 0;
+  font-size: 0.9em;
+  color: #bbb;
+}
+
+/* Forms */
+.username-form, .message-form {
+margin-top: 15px;
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 10px;
+}
+
+.username-form h2 {
+  color: #f0f0f0;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+
+input[type="text"],
+input[type="number"] {
+padding: 10px;
+border: 1px solid #555;
+border-radius: 4px;
+font-size: 1rem;
+background-color: #3a3e47;
+color: #f0f0f0;
+box-sizing: border-box;
+}
+
+input[type="text"]::placeholder,
+input[type="number"]::placeholder {
+  color: #aaa;
+}
+
+/* Ensure number inputs don't show default arrows */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
+button {
+padding: 10px 15px;
+cursor: pointer;
+background-color: #007bff;
+color: white;
+border: none;
+border-radius: 4px;
+font-size: 1rem;
+transition: background-color 0.2s ease;
+}
+
+button:disabled {
+background-color: #6c757d; /* Gris bootstrap secondary */
+cursor: not-allowed;
+opacity: 0.65;
+}
+
+button:hover:not(:disabled) {
+background-color: #0056b3;
+}
+
+.error-message {
+color: #dc3545;
+font-weight: bold;
+margin-top: 10px;
+background-color: rgba(220, 53, 69, 0.2);
+padding: 8px;
+border-radius: 4px;
+}
+
+/* Chat Box */
+.chat-box {
+border: 1px solid #555;
+padding: 15px;
+/* Removed top margin here, it will be handled by main-content gap */
+/* margin-top: 30px; */
+max-width: 400px; /* Adjusted width for right panel */
+width: 100%; /* Make it responsive up to max-width */
+/* Removed auto margins */
+background-color: #3a3e47;
+border-radius: 8px;
+display: flex;
+flex-direction: column;
+flex-shrink: 0; /* Prevent chat from shrinking */
+}
+
+.chat-box h2 {
+margin-top: 0;
+border-bottom: 1px solid #555;
+padding-bottom: 10px;
+color: #f0f0f0;
+}
+
+.messages {
+height: 300px; /* Fixed height for scroll */
+overflow-y: auto;
+border: 1px solid #555;
+margin-bottom: 15px;
+padding: 10px;
+text-align: left;
+background-color: #282c34;
+border-radius: 4px;
+display: flex;
+flex-direction: column;
+color: #ccc;
+word-wrap: break-word; /* Ensure long words wrap */
+white-space: pre-wrap; /* Preserve whitespace and wrap text */
+}
+
+.messages p {
+  margin: 4px 0; /* Reduced vertical margin */
+  line-height: 1.4;
+}
+
+.system-message {
+color: #aaa;
+font-style: italic;
+text-align: center;
+font-size: 0.9em;
+}
+
+.system-error-message {
+color: #dc3545;
+font-style: italic;
+font-weight: bold;
+text-align: center;
+font-size: 0.9em;
+}
+
+.user-message strong {
+  color: #61dafb;
+}
+
+.messages div:last-child {
+margin-top: auto;
+}
+
+.chat-box .message-form {
+  margin-top: 0; /* Remove top margin as parent has padding */
+}
+
+.chat-box .message-form input {
+  flex-grow: 1;
+}
+
+
+/* Lobby and Create Table Styles */
+
+.main-content {
+display: flex; /* Use flexbox for main sections (lobby/table + chat) */
+flex-direction: column; /* Stack by default for smaller screens */
+gap: 20px; /* Space between sections */
+margin-top: 0; /* Handled by App gap */
+width: 100%; /* Take full width of App */
+flex-grow: 1; /* Allow main content to grow */
+}
+
+.lobby {
+border: 1px solid #61dafb;
+padding: 20px;
+border-radius: 8px;
+background-color: #3a3e47;
+flex-grow: 1; /* Allow lobby to grow */
+display: flex; /* Use flex for internal layout */
+flex-direction: column;
+}
+
+.lobby h2, .lobby h3 {
+margin-top: 0;
+color: #61dafb;
+border-bottom: 1px solid #555;
+padding-bottom: 10px;
+margin-bottom: 15px;
+}
+
+.table-list {
+list-style: none;
+padding: 0;
+margin-bottom: 20px;
+}
+
+.table-list li {
+background-color: #282c34;
+border: 1px solid #555;
+padding: 10px 15px;
+margin-bottom: 10px;
+border-radius: 4px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+color: #f0f0f0;
+/* Added style for tables in progress */
+border-left: 5px solid transparent; /* Default border-left */
+}
+
+/* Style for tables in progress (added in App.js class list) */
+.table-list li.table-in-progress {
+  border-left-color: #ffc107; /* Orange indicator for in-progress */
+}
+
+
+.table-list li span {
+font-weight: bold;
+margin-right: 10px; /* Space between text and button */
+flex-grow: 1; /* Allow text to take space */
+}
+
+.table-list button {
+padding: 5px 10px;
+font-size: 0.9rem;
+background-color: #28a745; /* Green for join */
+}
+.table-list button:hover:not(:disabled) {
+  background-color: #218838;
+}
+.table-list button:disabled {
+  background-color: #444;
+}
+
+
+.create-table-form {
+margin-top: auto; /* Push to the bottom of the lobby flex container */
+padding-top: 20px;
+border-top: 1px dashed #555;
+text-align: center; /* Center the form content */
+}
+
+.create-table-form form div {
+margin-bottom: 15px;
+text-align: left;
+max-width: 400px;
+margin-left: auto;
+margin-right: auto;
+display: flex; /* Align label and input */
+align-items: center;
+gap: 10px;
+}
+
+.create-table-form label {
+flex-shrink: 0; /* Prevent label from shrinking */
+width: 120px; /* Fixed width for labels */
+text-align: right;
+font-weight: bold;
+color: #f0f0f0;
+}
+
+.create-table-form input[type="text"],
+.create-table-form input[type="number"] {
+flex-grow: 1; /* Input takes remaining space */
+width: auto; /* Override fixed width */
+}
+
+.create-table-form button {
+display: block;
+margin: 20px auto 0 auto;
+}
+
+/* Responsive layout for larger screens */
+@media (min-width: 900px) {
+.main-content {
+  flex-direction: row; /* Lobby/Table and Chat side by side */
+  align-items: stretch; /* Stretch items to fill height */
+}
+.lobby {
+  flex: 1; /* Lobby takes available width */
+}
+.chat-box {
+  flex: 0 0 350px; /* Fixed width for chat */
+  margin-top: 0;
+}
+.game-table-container {
+  flex: 1; /* Table container takes available width */
+  margin-right: 20px; /* Space between table and chat */
+  display: flex; /* Use flex for internal layout (info bar + table area + actions) */
+  flex-direction: column;
+  gap: 15px; /* Space between info bar, table area, actions */
+}
+}
+
+
+/* Active Table Styles */
+
+.game-table-container {
+  border: 2px solid #28a745;
+  padding: 20px; /* Increased padding */
+  border-radius: 8px;
+  background-color: #3a3e47;
+  position: relative; /* Allows positioning elements inside using absolute */
+}
+
+.table-info-bar {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #ccc;
+}
+.table-info-bar h2 {
+  margin: 0 0 5px 0;
+  color: #28a745;
+  font-size: 1.5em;
+}
+.table-info-bar p {
+   margin: 0;
+   font-size: 1em;
+   color: #bbb;
+}
+
+
+.game-table-area {
+  position: relative; /* Allows positioning players relative to this area */
+  width: 100%;
+  /* Use aspect ratio or fixed height for the table area */
+  padding-bottom: 60%; /* Maintain aspect ratio (e.g., 60% of width) */
+  min-height: 400px; /* Minimum height */
+  background-color: #0a4020; /* Green felt color */
+  border-radius: 50% / 30%; /* Create an oval shape */
+  border: 10px solid #5a4b30; /* Table rim color (brown/gold) */
+  box-sizing: border-box; /* Include border in dimensions */
+  display: flex; /* Use flexbox to center community cards/pot */
+  justify-content: center;
+  align-items: center;
+}
+
+/* Player Seats List - Positioned absolutely around the table area */
+.player-seats {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  /* This list will contain PlayerSeat components */
+  /* Individual PlayerSeat components will be positioned via CSS classes */
+}
+
+/* Styling for individual player seats (li elements) */
+/* These need to be positioned based on seat number */
+.player-seats li {
+  position: absolute; /* Absolute positioning on the oval */
+  /* Remove default list item styles */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  /* Basic styling for the player area container */
+  background-color: #282c34; /* Dark background */
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 5px; /* Reduced padding */
+  width: 120px; /* Fixed width for player area */
+  /* height: 100px; */ /* Height will adjust with content */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-align: center;
+  color: #f0f0f0;
+  font-size: 0.8em; /* Reduced font size */
+
+  /* Visual indicators */
+  transition: opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+/* Positioning for each seat (adjust top/left/transform based on your desired layout) */
+/* Example for a few seats (assuming 9 players max) */
+.player-seats .seat-1 { top: 85%; left: 50%; transform: translate(-50%, -50%); } /* Bottom center */
+.player-seats .seat-2 { top: 75%; left: 80%; transform: translate(-50%, -50%); } /* Bottom right */
+.player-seats .seat-3 { top: 40%; left: 95%; transform: translate(-50%, -50%); } /* Middle right */
+.player-seats .seat-4 { top: 15%; left: 80%; transform: translate(-50%, -50%); } /* Top right */
+.player-seats .seat-5 { top: 5%; left: 50%; transform: translate(-50%, -50%); } /* Top center */
+.player-seats .seat-6 { top: 15%; left: 20%; transform: translate(-50%, -50%); } /* Top left */
+.player-seats .seat-7 { top: 40%; left: 5%; transform: translate(-50%, -50%); } /* Middle left */
+.player-seats .seat-8 { top: 75%; left: 20%; transform: translate(-50%, -50%); } /* Bottom left */
+/* .player-seats .seat-9 { ... } */ /* Add more seats if needed */
+
+
+/* Style for empty seats */
+.player-seats li.empty {
+   border: 1px dashed #555;
+   background-color: #4a4e57;
+   color: #bbb;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   font-style: italic;
+}
+.player-seats li.empty .player-area, /* Hide player area content for empty seats */
+.player-seats li.empty .player-avatar,
+.player-seats li.empty .player-info-block,
+.player-seats li.empty .player-hole-cards,
+.player-seats li.empty .player-bet-chips,
+.player-seats li.empty .dealer-button {
+  display: none;
+}
+
+/* Styling for player info inside the seat */
+.player-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 100%; /* Take full width of the li */
+}
+
+.player-avatar {
+  width: 40px; /* Placeholder size */
+  height: 40px;
+  background-color: #61dafb; /* Placeholder color */
+  border-radius: 50%; /* Circle avatar */
+  border: 2px solid #fff;
+}
+
+.player-info-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.player-name strong {
+  font-size: 1.1em;
+  color: #61dafb; /* Player name color */
+}
+.player-status {
+  font-size: 0.8em;
+  color: #ccc;
+  font-weight: normal; /* Ensure status text is not bold by default */
+}
+
+.player-stack {
+  font-weight: bold;
+  color: #fff;
+}
+
+/* Player Status Classes */
+.player-seats li.folded {
+opacity: 0.6;
+background-color: #444;
+}
+.player-seats li.all-in {
+ border-color: #ffc107;
+ box-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
+}
+.player-seats li.sitting-out {
+  font-style: italic;
+  opacity: 0.8;
+  background-color: #333;
+  border-color: #444;
+  color: #bbb;
+}
+.player-seats li.sitting-out strong {
+  color: #999;
+}
+
+.player-seats li.current-turn {
+border: 2px solid #ffc107;
+background-color: #5a4b30;
+box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+}
+
+.player-seats li.winner {
+border-color: gold; /* Highlight winner border */
+background-color: #5a5030; /* Slightly golden background */
+}
+.player-seats li.winner strong {
+color: gold; /* Winner name gold */
+}
+
+/* Mucked status class for player list item */
+.player-seats li.mucked {
+  opacity: 0.5; /* Make mucked players faded */
+  border-color: #777;
+  background-color: #4a4a4a;
+}
+
+
+/* Player Hole Cards */
+.player-hole-cards {
+min-width: 90px; /* Space for 2 cards */
+display: flex;
+justify-content: center; /* Center cards within the player area */
+gap: 4px;
+margin-top: 5px; /* Space below info */
+}
+.player-hole-cards .card {
+  width: 40px; /* Adjusted size */
+  height: 55px;
+  font-size: 14px;
+}
+.player-hole-cards .card .rank { top: 1px; left: 3px; }
+.player-hole-cards .card .suit { bottom: 1px; right: 3px; font-size: 16px; }
+
+.player-hole-cards.empty { min-width: 0; gap: 0; margin-top: 5px; }
+
+
+/* Player Bet Chips (Placeholder) */
+.player-bet-chips {
+  position: absolute; /* Position near the player area */
+  bottom: -15px; /* Example positioning */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #2a9d8f; /* Teal/Chip color */
+  color: white;
+  font-size: 0.9em;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 12px; /* Chip shape */
+  border: 1px solid #fff;
+  z-index: 10; /* Ensure chips are above the table */
+  min-width: 25px; /* Ensure it fits small amounts */
+  text-align: center;
+}
+/* Adjust chip position per seat if needed (complex) */
+/* .seat-1 .player-bet-chips { bottom: 10px; } */
+
+
+/* Dealer Button (Placeholder) */
+.dealer-button {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: orange;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.8em;
+  font-weight: bold;
+  border: 1px solid #333;
+  z-index: 10; /* Above the table */
+  /* Position relative to the player seat (li) */
+  top: -10px;
+  right: -10px;
+}
+
+
+/* Community Cards Area */
+.community-cards-area {
+  position: absolute; /* Position within game-table-area */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center it */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 5; /* Below players, above table felt */
+}
+
+.community-cards {
+min-height: 65px; /* Space for cards */
+background-color: #4a4e57;
+padding: 8px;
+border-radius: 5px;
+border: 1px solid #555;
+text-align: center;
+display: flex; /* Layout cards horizontally */
+gap: 8px; /* Space between community cards */
+justify-content: center;
+align-items: center;
+}
+.community-cards p { margin: 0; font-size: 0.9em; color: #ccc; }
+.community-cards .card {
+  /* Sizes already defined in Card component, adjusted above */
+}
+
+.pot-info {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: gold; /* Gold color for pot */
+  background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent background */
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+
+/* Game Actions Area (Bottom Bar) */
+.game-actions {
+margin-top: auto; /* Push to the bottom of the game-table-container flex */
+padding: 15px;
+border-top: 1px dashed #555;
+border-bottom: none; /* No bottom border here */
+margin-bottom: 0;
+min-height: 50px;
+background-color: #3a3e47;
+border-radius: 5px;
+display: flex; /* Layout buttons horizontally */
+justify-content: center;
+align-items: center;
+flex-wrap: wrap; /* Allow buttons to wrap */
+gap: 10px; /* Space between buttons */
+}
+
+.game-actions h4 {
+margin: 0 20px 0 0; /* Space on the right */
+text-align: center;
+color: #ffc107;
+font-size: 1em; /* Smaller title */
+flex-shrink: 0; /* Prevent title from shrinking */
+}
+
+.game-actions p {
+  color: #bbb;
+  font-size: 0.9em;
+  margin: 0 10px;
+  flex-grow: 1; /* Allow message to take space */
+  text-align: center;
+}
+
+.game-actions button {
+margin: 0; /* Remove default margin if using gap */
+padding: 8px 12px;
+}
+
+.bet-raise-section {
+margin-top: 0; /* Remove top margin */
+padding-top: 0; /* Remove padding */
+border-top: none; /* Remove border */
+display: flex;
+align-items: center;
+gap: 10px;
+justify-content: center;
+flex-wrap: wrap;
+}
+
+.bet-input {
+width: 80px; /* Adjusted width */
+padding: 8px;
+text-align: right;
+}
+
+.game-actions button:disabled {
+background-color: #6c757d;
+cursor: not-allowed;
+opacity: 0.65;
+}
+
+/* Start Game Section */
+.start-game-section {
+text-align: center;
+margin: 20px 0;
+padding: 15px;
+background-color: #4a4e57;
+border: 1px solid #555;
+border-radius: 5px;
+}
+
+.start-game-button {
+padding: 12px 25px;
+font-size: 1.1em;
+background-color: #28a745;
+}
+
+.start-game-button:hover:not(:disabled) {
+background-color: #218838;
+}
+
+/* Leave Button */
+.leave-button {
+background-color: #dc3545;
+color: white;
+padding: 10px 15px;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+font-size: 1rem;
+margin-top: 15px;
+}
+
+.leave-button:hover:not(:disabled) {
+background-color: #c82333;
+}
+
+
+/* Showdown Results Section Styles (refined) */
+.showdown-results {
+/* Existing styles */
+background-color: #3a3e47; /* Darker background */
+border: 1px solid #ffc107; /* Orange/Yellow border */
+color: #f0f0f0;
+margin-bottom: 20px; /* Space below */
+}
+
+.showdown-results h3 {
+ color: #ffc107;
+ border-bottom-color: #666; /* Lighter separator */
+}
+.showdown-results p {
+ color: #ccc; /* Light grey text */
+ font-size: 1em; /* Default font size */
+}
+
+.showdown-results strong {
+ color: gold; /* Gold color for important text like winning hand name */
+}
+
+/* Showdown Reveal Order List (refined) */
+.showdown-reveal-order {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px dashed #666;
+  text-align: left;
+}
+
+.showdown-reveal-order h4 {
+  color: #ccc;
+  font-size: 1em;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.showdown-reveal-order ol {
+  list-style: none;
+  counter-reset: reveal-counter;
+  padding: 0;
+  margin: 0;
+}
+
+.showdown-reveal-order li {
+  counter-increment: reveal-counter;
+  margin-bottom: 10px;
+  padding: 10px; /* Adjusted padding */
+  background-color: #282c34; /* Dark background for list item */
+  border: 1px solid #555;
+  border-radius: 4px;
+  display: flex; /* Use flex to align info and cards */
+  align-items: center;
+  flex-wrap: wrap; /* Allow content to wrap */
+  position: relative;
+}
+
+.showdown-reveal-order li::before {
+  content: counter(reveal-counter) ". ";
+  position: absolute;
+  left: 5px;
+  top: 10px;
+  font-weight: bold;
+  color: #61dafb;
+}
+/* Adjust content padding to make space for number */
+.showdown-reveal-order li > strong {
+  padding-left: 20px; /* Add padding to strong or another inner div */
+}
+/* Alternative: add padding to the li and adjust before position */
+/* li { padding-left: 30px; position: relative; } li::before { left: 5px; top: 50%; transform: translateY(-50%);} */
+
+
+.showdown-reveal-order li strong {
+  margin-right: 5px;
+  color: #f0f0f0;
+  font-size: 1em; /* Reset font size */
+}
+
+.showdown-reveal-order li span {
+  font-size: 0.9em;
+  color: #ccc;
+  margin-right: 10px;
+}
+
+.showdown-reveal-order li .player-hole-cards {
+  margin-left: auto; /* Push cards to the right */
+  flex-shrink: 0;
+  /* Removed min-width here, controlled by card size */
+  margin-top: 0; /* Align cards vertically */
+}
+
+/* Style for small cards in showdown reveal */
+.player-hole-cards.small-cards .card {
+  width: 30px;
+  height: 45px;
+  font-size: 12px;
+  border-radius: 3px;
+  box-shadow: 0.5px 0.5px 2px rgba(0,0,0,0.3);
+}
+.player-hole-cards.small-cards .card .rank { top: 1px; left: 2px; }
+.player-hole-cards.small-cards .card .suit { bottom: 1px; right: 2px; font-size: 14px; }
+
+
+/* Style for the 'MUCK' card visual */
+.card.mucked {
+  background-color: #555;
+  color: #ddd;
+  font-size: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-weight: normal;
+  width: 45px;
+  height: 65px;
+}
+.player-hole-cards.small-cards .card.mucked {
+  width: 30px;
+  height: 45px;
+  font-size: 8px;
+}
+
+/* Styles for player list items during showdown */
+/* Faded/mucked style applied via li class */
+.player-list li.mucked {
+  opacity: 0.5;
+  border-color: #777;
+  background-color: #4a4a4a;
+}
+.player-list li.winner {
+border-left-color: gold;
+background-color: #4d452f;
+}
+.player-list li.winner strong {
+color: gold;
+}
+.player-list li.winner .player-info span {
+  color: #ccc;
+}
+.player-list li .player-hand-name {
+   display: inline-block;
+   margin-left: 10px;
+   font-style: italic;
+   color: #ccc;
+   font-size: 0.9em;
+}
+.player-list li .mucked-status {
+  font-style: italic;
+  color: #aaa;
+}
+
+.winner-indicator {
+  color: gold;
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+/* Add some basic styling for the empty seat div */
+.empty-seat {
+  font-style: italic;
+  color: #bbb;
+}
