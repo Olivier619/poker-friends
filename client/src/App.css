@@ -17,7 +17,7 @@ body {
 .App {
   text-align: center;
   padding: 20px;
-  max-width: 1200px; /* Increased max width to fit more content side-by-side */
+  max-width: 1400px; /* Increased max width to fit a wider table and chat side-by-side */
   margin: 0 auto;
   flex-grow: 1; /* App takes available space vertically */
   width: 100%; /* Use full width up to max-width */
@@ -28,6 +28,9 @@ body {
   gap: 20px; /* Space between sections */
 }
 
+/* Title and Status Bar */
+/* Keep H1 centered at the top in default column layout */
+/* Status P will be handled by its container in the row layout */
 .App h1 {
   color: #61dafb;
   margin-bottom: 10px;
@@ -38,6 +41,13 @@ body {
   font-size: 0.9em;
   color: #bbb;
 }
+/* Style for status text when moved next to chat */
+.status-text {
+  font-size: 1em; /* Make status text slightly larger */
+  font-weight: bold;
+  color: #f0f0f0;
+}
+
 
 /* Forms */
 .username-form, .message-form {
@@ -128,6 +138,7 @@ button:hover:not(:disabled) {
   flex-direction: column;
   flex-shrink: 0; /* Prevent chat from shrinking */
   box-sizing: border-box; /* Include padding/border in width */
+  /* Removed margin-top here, handled by chat-and-leave-container gap */
 }
 
 .chat-box h2 {
@@ -305,14 +316,25 @@ button:hover:not(:disabled) {
   margin: 20px auto 0 auto;
 }
 
-/* Container for Chat and Leave Button */
+/* Container for Chat and Leave Button + Header */
 .chat-and-leave-container {
   display: flex;
-  flex-direction: column; /* Stack Chat and Button by default */
-  gap: 20px; /* Space between Chat and Button */
+  flex-direction: column; /* Stack Header, Chat, and Button by default */
+  gap: 15px; /* Space between Header, Chat, and Button */
   width: 100%; /* Take full width when stacked */
   max-width: 400px; /* Max width for chat column */
   flex-shrink: 0; /* Prevent shrinking */
+  box-sizing: border-box;
+  align-items: center; /* Center items within this column */
+}
+
+/* Header content inside chat-and-leave-container */
+.chat-and-leave-container h1 {
+  margin-bottom: 0; /* Adjust margin */
+  font-size: 1.5em; /* Adjust size */
+}
+.chat-and-leave-container .status-text {
+  margin-top: 5px; /* Adjust margin */
 }
 
 
@@ -329,6 +351,7 @@ button:hover:not(:disabled) {
   .chat-and-leave-container {
      /* flex: 0 0 350px; */ /* Fixed width for chat column - alternative to max-width */
      margin-top: 0;
+     /* In row layout, align-items: flex-start on main-content makes this column align to top */
   }
   .game-table-container {
     flex: 1; /* Table container takes available width */
@@ -377,11 +400,11 @@ button:hover:not(:disabled) {
 .game-table-area {
   position: relative; /* Allows positioning players relative to this area */
   width: 98%; /* Make oval slightly smaller than container */
-  /* Adjust aspect ratio for a wider/taller oval */
-  padding-bottom: 40%; /* Lower padding-bottom for a much wider/flatter oval */
-  min-height: 300px; /* Minimum height */
+  /* Adjust aspect ratio for a much wider/flatter oval */
+  padding-bottom: 35%; /* Lower padding-bottom for a very wide/flatter oval */
+  min-height: 300px; /* Minimum vertical height - adjusted slightly */
   background-color: #0a4020; /* Green felt color */
-  border-radius: 50% / 15%; /* Create a flatter oval shape (reduced vertical radius) */
+  border-radius: 50% / 12.5%; /* Create a much flatter oval shape (reduced vertical radius) */
   border: 10px solid #5a4b30; /* Table rim color (brown/gold) */
   box-sizing: border-box; /* Include border in dimensions */
   display: flex; /* Use flexbox to center community cards/pot */
@@ -434,27 +457,15 @@ button:hover:not(:disabled) {
 
 /* Positioning for each seat (adjust top/left/transform based on your desired layout) */
 /* Example for 9 players on a flatter oval */
-.player-seats .seat-1 { bottom: 0; left: 50%; transform: translate(-50%, 0%); } /* Bottom center */
-.player-seats .seat-2 { bottom: 10%; left: 75%; transform: translate(-50%, 0%); } /* Bottom right */
-.player-seats .seat-3 { top: 25%; left: 95%; transform: translate(-50%, -50%); } /* Mid-right */
-.player-seats .seat-4 { top: 25%; left: 5%; transform: translate(-50%, -50%); } /* Mid-left */
-.player-seats .seat-5 { top: 10%; left: 75%; transform: translate(-50%, 0%); } /* Top right */
-.player-seats .seat-6 { top: 0; left: 50%; transform: translate(-50%, 0%); } /* Top center */
-.player-seats .seat-7 { top: 10%; left: 25%; transform: translate(-50%, 0%); } /* Top left */
-.player-seats .seat-8 { bottom: 10%; left: 25%; transform: translate(-50%, 0%); } /* Bottom left */
-.player-seats .seat-9 { top: 50%; left: 50%; transform: translate(-50%, -50%); } /* Center (often for 2 players, or specific layout) - Adjust or remove if not using */
-/* Re-adjust Seat-9 position if using 9 players on a spread-out oval */
-.player-seats .seat-9 { top: 40%; left: 90%; transform: translate(-50%, -50%); } /* Example for a different layout */
-/* Better distribution for 9 seats on flatter oval: */
 .player-seats .seat-1 { bottom: 5%; left: 50%; transform: translate(-50%, 0%); } /* Bottom center */
 .player-seats .seat-2 { bottom: 10%; left: 75%; transform: translate(-50%, 0%); } /* Bottom right */
-.player-seats .seat-3 { bottom: 40%; left: 95%; transform: translate(-50%, -50%); } /* Mid-right */
-.player-seats .seat-4 { top: 40%; left: 95%; transform: translate(-50%, -50%); } /* Upper-right */
+.player-seats .seat-3 { bottom: 30%; left: 95%; transform: translate(-50%, -50%); } /* Mid-right */
+.player-seats .seat-4 { top: 30%; left: 95%; transform: translate(-50%, -50%); } /* Upper-right */
 .player-seats .seat-5 { top: 10%; left: 75%; transform: translate(-50%, 0%); } /* Top right */
 .player-seats .seat-6 { top: 5%; left: 50%; transform: translate(-50%, 0%); } /* Top center */
 .player-seats .seat-7 { top: 10%; left: 25%; transform: translate(-50%, 0%); } /* Top left */
-.player-seats .seat-8 { top: 40%; left: 5%; transform: translate(-50%, -50%); } /* Upper-left */
-.player-seats .seat-9 { bottom: 40%; left: 5%; transform: translate(-50%, -50%); } /* Mid-left */
+.player-seats .seat-8 { top: 30%; left: 5%; transform: translate(-50%, -50%); } /* Upper-left */
+.player-seats .seat-9 { bottom: 30%; left: 5%; transform: translate(-50%, -50%); } /* Mid-left */
 
 
 /* Style for empty seats */
@@ -569,15 +580,31 @@ button:hover:not(:disabled) {
   gap: 3px; /* Reduced gap */
   margin-top: 4px; /* Space below info */
 }
+/* Styles for the card image inside the card div */
+.card img {
+  display: block; /* Remove extra space below img */
+  width: 100%; /* Make image fill its container div */
+  height: 100%; /* Make image fill its container div */
+  object-fit: cover; /* Cover the container, may crop slightly */
+  border-radius: 4px; /* Match border radius of the card div */
+}
 .player-hole-cards .card {
   width: 35px; /* Adjusted size */
   height: 50px;
-  font-size: 12px; /* Adjusted font size */
+  /* Remove old text/symbol styling */
+  border: none;
+  background-color: transparent;
+  position: relative; /* Needed for MUCK overlay */
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.4); /* Keep subtle shadow */
 }
-.player-hole-cards .card .rank { top: 1px; left: 3px; }
-.player-hole-cards .card .suit { bottom: 1px; right: 3px; font-size: 14px; }
-
-.player-hole-cards.empty { min-width: 0; gap: 0; margin-top: 5px; }
+.player-hole-cards .card.empty { /* Style for the empty slot card div */
+    width: 35px;
+    height: 50px;
+    border: 1px dashed #555;
+    background-color: #4a4e57;
+    box-shadow: none;
+    border-radius: 4px;
+}
 
 
 /* Player Bet Chips */
@@ -649,8 +676,22 @@ button:hover:not(:disabled) {
 }
 .community-cards p { margin: 0; font-size: 0.9em; color: #ccc; }
 .community-cards .card {
-  /* Sizes already defined in Card component, adjusted above */
+   width: 40px; /* Adjusted size for community cards */
+   height: 55px;
+   border: none; /* Remove border from card div */
+   background-color: transparent;
+   box-shadow: 1px 1px 3px rgba(0,0,0,0.4); /* Keep subtle shadow */
 }
+/* Style for empty community card slots */
+.community-cards .card.empty {
+    width: 40px;
+    height: 55px;
+    border: 1px dashed #555;
+    background-color: #4a4e57;
+    box-shadow: none;
+    border-radius: 4px;
+}
+
 
 .pot-info {
   font-size: 1.2em;
@@ -789,7 +830,52 @@ button:hover:not(:disabled) {
 }
 
 /* Style for the 'MUCK' card visual */
-/* Uses existing .card.mucked style from previous CSS */
+.card.mucked {
+  background-color: #555;
+  color: #ddd;
+  font-size: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-weight: normal;
+  width: 45px; /* Match standard card size */
+  height: 65px;
+   /* Remove default img styling for muck */
+  border: none;
+  box-shadow: none;
+  border-radius: 4px;
+}
+.card.mucked img { /* Hide the image inside the muck card */
+  display: none;
+}
+
+/* Ensure muck visual has space like other cards */
+.player-hole-cards.mucked-cards {
+    min-width: 80px; /* Same space as two card images */
+    display: flex;
+    justify-content: center;
+    gap: 3px;
+    margin-top: 4px;
+}
+/* Style the individual MUCK card div */
+.player-hole-cards.mucked-cards .card.mucked {
+     width: 35px; /* Match other card image sizes */
+     height: 50px;
+     /* Add text/symbol styling back for the MUCK text */
+     font-size: 10px;
+     color: #ddd;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     text-align: center;
+     font-weight: normal;
+     border: 1px solid #777;
+     background-color: #4a4a4a;
+     box-shadow: none;
+     border-radius: 4px;
+}
+
 
 /* Add some basic styling for the empty seat div */
 .empty-seat {
