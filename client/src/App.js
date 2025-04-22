@@ -4,30 +4,57 @@ import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import './App.css'; // Import the CSS file for styling
 
-// Define suit symbols outside of component scope if needed in multiple places
+// Define suit symbols for chat messages
 const suitSymbols = { s: '♠', h: '♥', d: '♦', c: '♣' };
+// Mapping for card image file names if needed (e.g., 'h' -> 'hearts', 'T' -> '10')
+const suitImageMap = { s: 'spades', h: 'hearts', d: 'diamonds', c: 'clubs' };
+const rankImageMap = { 'T': '10', 'J': 'J', 'Q': 'Q', 'K': 'K', 'A': 'A' }; // Add other ranks if file names differ (e.g., '2':'2')
+
 
 // --- Card Component ---
-// Component to display a single card
+// Component to display a single card image
 function Card({ card }) {
-    if (!card) return <div className="card empty"></div>;
-    // Ensure suitSymbols is accessible or defined here
-    // const suitSymbols = { s: '♠', h: '♥', d: '♦', c: '♣' }; // Already defined globally above
-    const rank = card.substring(0, card.length - 1);
-    const suit = card.substring(card.length - 1);
-    // Use Pokersolver ranks 'T', 'J', 'Q', 'K', 'A' directly if present
-    const displayRank = rank === 'T' ? '10' : rank; // Display '10' instead of 'T'
+    if (!card) return <div className="card empty"></div>; // Render empty slot div
 
+    let imgSrc = '';
+    let altText = '';
+    let cardClass = 'card';
 
-    const color = (suit === 'h' || suit === 'd') ? 'red' : 'black';
+    if (card === 'back') {
+        // Handle card back
+        imgSrc = '/cards/back.png'; // Path to your card back image
+        altText = 'Card Back';
+        cardClass += ' back';
+    } else {
+        // Handle a specific card string (e.g., 'Ah', 'Ts')
+        const rank = card.substring(0, card.length - 1);
+        const suit = card.substring(card.length - 1);
 
+        const fileRank = rankImageMap[rank] || rank; // Use mapped rank or original
+        const fileSuit = suitImageMap[suit] || suit; // Use mapped suit or original
+
+        // Construct the image path
+        // Example: /cards/hearts/A.png or /cards/spades/10.png
+        imgSrc = `/cards/${fileSuit}/${fileRank}.png`;
+        altText = `${rank} of ${suit}`; // Simple alt text (can improve with full names)
+
+         // Add color class to the div for potential styling if needed, even with image
+         const color = (suit === 'h' || suit === 'd') ? 'red' : 'black';
+         cardClass += ` suit-${suit} color-${color}`; // Keep suit/color classes on the div
+    }
+
+    // Render a div containing the img, allowing flex/grid styling of the div
     return (
-        <div className={`card suit-${suit} color-${color}`}>
-            <span className="rank">{displayRank}</span>
-            <span className="suit">{suitSymbols[suit]}</span>
+        <div className={cardClass}>
+            <img src={imgSrc} alt={altText} onError={(e) => {
+                console.error("Error loading card image:", imgSrc);
+                // Optionally replace with a placeholder or hide
+                e.target.style.display = 'none';
+            }} />
         </div>
     );
 }
+
 
 // --- Player Cards Component ---
 // Component to display a player's two hole cards (face up, face down, or mucked)
@@ -47,35 +74,30 @@ function PlayerCards({ player, isSelf }) {
     // Check if player mucked their hand at showdown
     const hasMucked = isShowdownPhase && player.showdownInfo?.show === false;
 
-
+    // Determine the cards to render (actual cards, card back placeholder, or empty)
+    let cardsToRender = [];
     if (shouldShowFaceUp && player?.holeCards && player.holeCards.length === 2) {
-         return (
-             <div className="player-hole-cards">
-                 <Card card={player.holeCards[0]} />
-                 <Card card={player.holeCards[1]} />
-             </div>
-         );
+         cardsToRender = player.holeCards; // Actual card strings
+    } else if (shouldShowBacks) {
+         cardsToRender = ['back', 'back']; // Special string for card back image
     } else if (hasMucked) {
-         // Explicitly show mucked state at showdown if the player *was* in showdownPlayers list
-         // The server sends showdownInfo for all players who reached showdown state, even if they muck.
-          // We only show the 'MUCK' visual if they reached showdown and explicitly mucked.
+        // Keep the visual 'MUCK' div for consistency with previous style
          return (
-              <div className="player-hole-cards">
+              <div className="player-hole-cards mucked-cards">
                   <div className="card mucked">MUCK</div> {/* Visual indicator for mucked */}
               </div>
          );
-    } else if (shouldShowBacks) {
-        // Display card backs if player had cards, but they are hidden
-        return (
-            <div className="player-hole-cards">
-                <div className="card back"></div>
-                <div className="card back"></div>
-            </div>
-        );
-    } else {
-        // Empty space if the player didn't have cards (e.g. joined late) or is folded/sitting out/empty seat
-        return <div className="player-hole-cards empty"></div>;
     }
+
+
+    // Render Card components for the determined cards (or empty slots)
+    // Always render two card containers to maintain layout space consistency
+    return (
+        <div className="player-hole-cards">
+            <Card card={cardsToRender[0] || null} /> {/* Pass null for first card if none */}
+            <Card card={cardsToRender[1] || null} /> {/* Pass null for second card if none */}
+        </div>
+    );
 }
 
 
@@ -99,8 +121,8 @@ function PlayerSeat({ player, isCurrentUser, tableDetails }) {
         isPlayerTurn ? 'current-turn' : '',
         // Apply winner class ONLY during or after showdown if they are marked as winner
         (tableDetails?.stage === 'showdown' || tableDetails?.stage === 'showdown_complete' || tableDetails?.status === 'finished') && showdownPlayerInfo?.isWinner ? 'winner' : '',
-         // Add 'mucked' class during showdown stages if mucked
-        (tableDetails?.stage === 'showdown' || tableDetails?.stage === 'showdown_complete' || tableDetails?.status === 'finished') && showdownPlayerInfo?.show === false ? 'mucked' : '',
+         // Add 'mucked' class during showdown stages if mucked (handled by PlayerCards now, but keeping class on li can be useful for LI styling)
+        // (tableDetails?.stage === 'showdown' || tableDetails?.stage === 'showdown_complete' || tableDetails?.status === 'finished') && showdownPlayerInfo?.show === false ? 'mucked-li' : '', // Use different class name to avoid conflict
         isCurrentUser ? 'current-user-seat' : '' // Special class for the current user's seat
     ].filter(Boolean).join(' ');
 
@@ -203,6 +225,7 @@ function App() {
 
     // Effect to manage Socket.IO connection and listeners
     useEffect(() => {
+        // Use the environment variable for the socket URL
         const socketIoUrl = process.env.REACT_APP_SOCKET_URL;
         if (!socketIoUrl) {
             console.error("ERREUR: La variable d'environnement REACT_APP_SOCKET_URL n'est pas définie !");
@@ -316,7 +339,7 @@ function App() {
                                          const suit = card.substring(card.length - 1);
                                          const displayRank = rank === 'T' ? '10' : rank;
                                          return `${displayRank}${suitSymbols[suit]}`; // Use global suitSymbols
-                                     }).join(', ');
+                                     }).join(' ');
                                     newMessages = [...newMessages, { system: true, text: `Le Flop est distribué : [ ${formattedFlop} ]`, timestamp }];
                               }
                           } else if (previousStage === 'flop_betting' && currentStage === 'turn_betting') {
@@ -826,9 +849,12 @@ function App() {
     // --- Render UI ---
     return (
         <div className="App">
-            <h1>Poker entre Amis</h1>
-            {/* Display connection status and username */}
-            <p>Status: {isConnected ? `Connecté ✅ ${username ? `(${username})` : ''}` : 'Déconnecté ❌'}</p>
+            {/* Title and Status moved to the right side, above chat */}
+             {/* <div className="header-right"> // Example container */}
+                 <h1>Poker entre Amis</h1>
+                 <p>Status: {isConnected ? `Connecté ✅ ${username ? `(${username})` : ''}` : 'Déconnecté ❌'}</p>
+            {/* </div> */}
+
             {/* Display error messages */}
             {error && <p className="error-message">{error}</p>}
 
@@ -1062,7 +1088,14 @@ function App() {
 
                     {/* --- CHAT AND LEAVE BUTTON CONTAINER --- */}
                     {/* Wrap Chat and Leave button in a container for positioning */}
+                    {/* Title and Status are moved here as well */}
                     <div className="chat-and-leave-container">
+                        {/* Title and Status - Re-added here */}
+                        {/* <div className="header-right-content"> // Optional: wrapper for alignment if needed */}
+                             {/* <h1>Poker entre Amis</h1> // Keep H1 centered at top per typical web layout */}
+                             {/* <p className="status-text">Status: {isConnected ? `Connecté ✅ ${username ? `(${username})` : ''}` : 'Déconnecté ❌'}</p> */}
+                        {/* </div> */}
+
                         {/* --- CHAT --- */}
                         <div className="chat-box">
                             <h2>Chat</h2>
