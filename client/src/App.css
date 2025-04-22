@@ -1,822 +1,5 @@
 /* client/src/App.css */
 
-/* Styles généraux du corps de l'application */
-body {
-    margin: 0;
-    padding: 0;
-    background-color: #282c34; /* Fond sombre appliqué au body */
-    color: #f0f0f0; /* Texte clair par default */
-    font-family: sans-serif;
-}
-
-.App {
-  text-align: center;
-  padding: 20px;
-  max-width: 1000px; /* Limite la largeur pour une meilleure lisibilité */
-  margin: 0 auto; /* Centre l'application */
-  min-height: 100vh; /* Hauteur minimale pour occuper toute la vue */
-  box-sizing: border-box; /* Inclut padding et border dans la largeur/hauteur */
-}
-
-.App h1 {
-    color: #61dafb; /* Couleur React blue */
-    margin-bottom: 10px;
-}
-
-.App p {
-    margin-top: 0;
-    font-size: 0.9em;
-    color: #bbb;
-}
-
-/* Styles pour les formulaires */
-.username-form, .message-form {
-  margin-top: 15px;
-  display: flex; /* Aligner input et bouton */
-  justify-content: center; /* Centrer horizontalement */
-  align-items: center; /* Aligner verticalement */
-  gap: 10px; /* Espace entre input et bouton */
-}
-
-.username-form h2 {
-    color: #f0f0f0;
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-
-
-input[type="text"],
-input[type="number"] {
-  padding: 10px;
-  border: 1px solid #555; /* Bordure foncée */
-  border-radius: 4px;
-  font-size: 1rem;
-  background-color: #3a3e47; /* Fond input foncé */
-  color: #f0f0f0; /* Texte input clair */
-  box-sizing: border-box;
-}
-
-input[type="text"]::placeholder,
-input[type="number"]::placeholder {
-    color: #aaa; /* Placeholder plus clair */
-}
-
-
-button {
-  padding: 10px 15px;
-  cursor: pointer;
-  background-color: #007bff; /* Bleu standard */
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: background-color 0.2s ease; /* Animation au survol */
-}
-
-button:disabled {
-  background-color: #444; /* Gris foncé pour désactivé */
-  cursor: not-allowed;
-  opacity: 0.65; /* Rendre légèrement transparent */
-}
-
-button:hover:not(:disabled) {
-  background-color: #0056b3; /* Bleu plus foncé au survol */
-}
-
-.error-message {
-  color: #dc3545; /* Rouge vif */
-  font-weight: bold;
-  margin-top: 10px;
-  background-color: rgba(220, 53, 69, 0.2); /* Fond rouge léger */
-  padding: 8px;
-  border-radius: 4px;
-}
-
-/* Styles du Chat */
-.chat-box {
-  border: 1px solid #555; /* Bordure foncée */
-  padding: 15px;
-  margin-top: 30px;
-  max-width: 700px; /* Largeur max du chat */
-  margin-left: auto;
-  margin-right: auto;
-  background-color: #3a3e47; /* Fond foncé */
-  border-radius: 8px;
-  display: flex; /* Utilise flexbox pour mettre messages et form en colonne */
-  flex-direction: column;
-}
-
-.chat-box h2 {
-  margin-top: 0;
-  border-bottom: 1px solid #555; /* Ligne de séparation foncée */
-  padding-bottom: 10px;
-  color: #f0f0f0;
-}
-
-.messages {
-  height: 350px; /* Hauteur fixe pour le scroll */
-  overflow-y: auto; /* Activer le scroll vertical */
-  border: 1px solid #555;
-  margin-bottom: 15px;
-  padding: 10px;
-  text-align: left;
-  background-color: #282c34; /* Fond de chat encore plus foncé */
-  border-radius: 4px;
-  display: flex; /* Permet au contenu de pousser vers le bas */
-  flex-direction: column; /* Empile les messages verticalement */
-  color: #ccc; /* Texte clair pour les messages */
-}
-
-.messages p {
-    margin: 8px 0;
-    word-wrap: break-word; /* Coupe les mots longs */
-    line-height: 1.4;
-}
-
-.system-message {
-  color: #aaa; /* Gris clair pour les messages système */
-  font-style: italic;
-  text-align: center; /* Centrer les messages système */
-  font-size: 0.9em;
-}
-
-.system-error-message {
-  color: #dc3545; /* Rouge vif pour les erreurs système */
-  font-style: italic;
-  font-weight: bold;
-  text-align: center;
-  font-size: 0.9em;
-}
-
-.user-message {
-  margin: 5px 0;
-}
-
-.user-message strong { /* Style pour le nom d'utilisateur */
-    color: #61dafb; /* Couleur React */
-}
-
-/* Espace vide à la fin pour le scrollIntoView */
-.messages div:last-child {
-  margin-top: auto;
-}
-
-.chat-box .message-form input {
-    flex-grow: 1; /* L'input prend l'espace restant */
-}
-
-
-/* Styles du Lobby et Création de Table */
-
-.main-content {
-  display: flex; /* Optionnel: pour mettre lobby et chat côte à côte plus tard */
-  flex-direction: column; /* Par default, l'un sous l'autre */
-  gap: 30px; /* Espace entre les sections */
-  margin-top: 20px;
-}
-
-.lobby {
-  border: 1px solid #61dafb; /* Bordure bleue/cyan */
-  padding: 20px;
-  border-radius: 8px;
-  background-color: #3a3e47; /* Fond foncé */
-}
-
-.lobby h2, .lobby h3 {
-  margin-top: 0;
-  color: #61dafb; /* Titres bleus/cyan */
-  border-bottom: 1px solid #555;
-  padding-bottom: 10px;
-  margin-bottom: 15px;
-}
-
-.table-list {
-  list-style: none;
-  padding: 0;
-  margin-bottom: 30px; /* Espace avant le formulaire de création */
-}
-
-.table-list li {
-  background-color: #282c34; /* Fond de liste foncé */
-  border: 1px solid #555;
-  padding: 10px 15px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-  display: flex; /* Aligner le texte et le bouton */
-  justify-content: space-between; /* Mettre le bouton à droite */
-  align-items: center; /* Centrer verticalement */
-  color: #f0f0f0; /* Texte clair */
-}
-
-.table-list li span {
-  font-weight: bold;
-}
-
-.table-list button {
-  padding: 5px 10px; /* Bouton plus petit */
-  font-size: 0.9rem;
-  background-color: #28a745; /* Vert pour rejoindre */
-}
-.table-list button:hover:not(:disabled) {
-    background-color: #218838;
-}
-.table-list button:disabled {
-    background-color: #444;
-}
-
-
-.create-table-form {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px dashed #555; /* Séparateur visuel foncé */
-}
-
-.create-table-form form div {
-  margin-bottom: 15px; /* Espace entre les lignes du formulaire */
-  text-align: left; /* Aligner labels et inputs à gauche */
-  max-width: 400px; /* Limiter largeur du formulaire */
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.create-table-form label {
-  display: inline-block; /* Permet de définir une largeur */
-  width: 140px; /* Aligner les inputs */
-  margin-right: 10px;
-  text-align: right;
-  font-weight: bold;
-  color: #f0f0f0;
-}
-
-.create-table-form input[type="text"],
-.create-table-form input[type="number"] {
-  width: 200px; /* Largeur fixe pour les inputs */
-}
-
-.create-table-form button {
-  display: block; /* Bouton sur sa propre ligne */
-  margin: 20px auto 0 auto; /* Centrer le bouton */
-}
-
-/* Optionnel: Layout côte à côte pour écrans larges */
-@media (min-width: 900px) {
-  .main-content {
-    flex-direction: row; /* Lobby et Chat côte à côte */
-    align-items: flex-start; /* Aligner en haut */
-  }
-  .lobby {
-    flex: 1; /* Le lobby prend l'espace disponible */
-  }
-  .chat-box {
-    flex: 0 0 350px; /* Largeur fixe pour le chat */
-    margin-top: 0; /* Réinitialiser marge si côte à côte */
-  }
-   /* Assure que la table prend la place si en mode côte à côte et actif */
-  .game-table-active {
-    flex: 1;
-    margin-right: 30px; /* Espace entre table et chat */
-  }
-}
-
-/* Styles de la Table Active */
-
-.game-table-active {
-  border: 2px solid #28a745; /* Bordure verte */
-  padding: 20px;
-  border-radius: 8px;
-  background-color: #3a3e47; /* Fond foncé similaire au chat */
-  flex-grow: 1; /* Prend plus de place si en mode flex row */
-}
-
-.game-table-active h2, .game-table-active h3 {
-  margin-top: 0;
-  color: #28a745; /* Titres verts */
-  border-bottom: 1px solid #555;
-  padding-bottom: 10px;
-  margin-bottom: 15px;
-}
-
-.game-table-active p { /* Styles génériques dans la table */
-    color: #ccc;
-}
-
-.player-list {
-  list-style: none;
-  padding: 0;
-  margin-bottom: 20px;
-}
-
-.player-list li {
-  background-color: #282c34; /* Fond joueur foncé */
-  border: 1px solid #555;
-  padding: 8px 12px;
-  margin-bottom: 8px; /* Plus d'espace entre joueurs */
-  border-radius: 4px;
-  color: #f0f0f0;
-  display: flex;
-  justify-content: space-between; /* Espace entre infos et cartes */
-  align-items: center; /* Centrer verticalement */
-  transition: opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease; /* Transitions pour les états */
-}
-
-.player-list li strong {
-    color: #61dafb; /* Pseudo en couleur React */
-}
-
-.player-list li span { /* Pour le "(Vous)" */
-    color: #28a745; /* Vert pour "Vous" et (D) */
-    font-weight: bold;
-}
-
-.player-list li.folded {
-  opacity: 0.6; /* Griser le joueur */
-  background-color: #444; /* Fond plus gris */
-}
-.player-list li.all-in {
-   border-color: #ffc107; /* Bordure jaune/orange */
-   box-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
-}
-.player-list li.sitting-out {
-    font-style: italic;
-    opacity: 0.8;
-    background-color: #333;
-    border-color: #444;
-    color: #bbb;
-}
-.player-list li.sitting-out strong {
-    color: #999;
-}
-
-
-.player-list li.current-turn {
-  border: 2px solid #ffc107; /* Bordure jaune/orange pour le tour */
-  background-color: #5a4b30; /* Fond légèrement orangé */
-  box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
-}
-
-
-.player-info {
-  display: flex;
-  flex-direction: column; /* Empiler les infos */
-  text-align: left;
-  flex-grow: 1; /* Prendre l'espace dispo */
-  margin-right: 10px; /* Espace entre info et cartes */
-}
-.player-info span { font-size: 0.9em; }
-.player-info strong { font-size: 1.1em; margin-right: 5px;}
-
-.player-hole-cards {
-  min-width: 110px; /* Espace pour 2 cartes + marges */
-  display: flex; /* Permet aux cartes de s'aligner */
-  justify-content: flex-end; /* Aligne les cartes à droite */
-}
-.player-hole-cards .card {
-    margin-left: 4px; /* Espace entre les cartes */
-}
-.player-hole-cards.empty { min-width: 0; } /* Pas besoin d'espace si vide */
-
-
-/* Styles des Cartes */
-
-.card {
-  display: inline-block;
-  border: 1px solid #333;
-  border-radius: 5px;
-  width: 45px; /* Taille légèrement réduite */
-  height: 65px;
-  margin: 2px 0; /* Ajuste les marges */
-  background-color: white;
-  position: relative;
-  font-size: 16px; /* Taille de police ajustée */
-  font-weight: bold;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.4); /* Ombre plus visible sur fond sombre */
-  color: black; /* Couleur par default du texte */
-}
-
-.card.back {
-  background-color: #b00; /* Dos rouge */
-  background-image: linear-gradient(135deg, #f00 25%, transparent 25%),
-                    linear-gradient(225deg, #f00 25%, transparent 25%),
-                    linear-gradient(45deg, #f00 25%, transparent 25%),
-                    linear-gradient(315deg, #f00 25%, #b00 25%);
-  background-position: 5px 0, 5px 0, 0 0, 0 0;
-  background-size: 10px 10px;
-  background-repeat: repeat;
-  color: transparent; /* Cache le texte sur le dos */
-}
-.card.empty { border: 1px dashed #555; background: #4a4e57; box-shadow: none; } /* Vide plus sombre */
-
-.card .rank { position: absolute; top: 2px; left: 4px; }
-.card .suit { position: absolute; bottom: 2px; right: 4px; font-size: 18px; /* Taille de police de la couleur */ }
-.card.color-red { color: #dc3545; } /* Rouge vif pour les coeurs/carreaux */
-.card.color-black { color: #282c34; } /* Noir très foncé pour les piques/trèfles */
-
-
-/* Styles des Cartes Communes */
-.community-cards {
-  min-height: 80px; /* Espace même si vide */
-  background-color: #4a4e57; /* Fond légèrement plus clair que la table */
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 20px;
-  text-align: center;
-  border: 1px solid #555;
-}
-.community-cards h3 {
-    margin-top: 0;
-    margin-bottom: 5px;
-    font-size: 1em;
-    color: #ccc; /* Texte clair */
-}
-.community-cards .card {
-    margin: 2px 5px; /* Plus d'espace entre les cartes communes */
-}
-
-
-/* Styles des Actions de Jeu */
-.game-actions {
-  margin-top: 20px;
-  padding: 15px;
-  border-top: 1px dashed #555;
-  border-bottom: 1px dashed #555;
-  margin-bottom: 20px;
-  min-height: 50px; /* Espace */
-  background-color: #3a3e47; /* Fond foncé */
-  border-radius: 5px;
-}
-
-.game-actions h4 {
-  margin-top: 0;
-  margin-bottom: 15px;
-  text-align: center;
-  color: #ffc107; /* Orange pour le titre des actions */
-}
-
-.game-actions p { /* Message à l'utilisateur s'il ne peut pas agir */
-    color: #bbb;
-    font-size: 0.9em;
-    margin-bottom: 10px;
-}
-
-
-.game-actions button {
-  margin: 5px;
-  padding: 8px 12px;
-}
-
-/* Styles pour l'input de mise/relance */
-.bet-raise-section {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #555;
-  display: flex; /* Aligner input et boutons */
-  align-items: center;
-  gap: 10px; /* Espace entre éléments */
-  justify-content: center; /* Centrer horizontalement */
-  flex-wrap: wrap; /* Permettre aux éléments de passer à la ligne si l'espace est limité */
-}
-
-.bet-input {
-  width: 90px; /* Largeur pour le montant */
-  padding: 8px;
-  text-align: right;
-}
-
-.game-actions button:disabled {
-  background-color: #6c757d; /* Gris pour désactivé */
-  cursor: not-allowed;
-  opacity: 0.65;
-}
-
-/* Styles pour le bouton Démarrer Partie */
-.start-game-section {
-  text-align: center;
-  margin: 20px 0;
-  padding: 15px;
-  background-color: #4a4e57; /* Fond foncé */
-  border: 1px solid #555;
-  border-radius: 5px;
-}
-
-.start-game-button {
-  padding: 12px 25px;
-  font-size: 1.1em;
-  background-color: #28a745; /* Vert */
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.start-game-button:hover:not(:disabled) {
-  background-color: #218838;
-}
-
-/* Styles pour le bouton Quitter */
-.leave-button {
-  background-color: #dc3545; /* Rouge pour quitter */
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  margin-top: 15px; /* Plus d'espace au-dessus */
-}
-
-.leave-button:hover:not(:disabled) {
-  background-color: #c82333;
-}
-
-/* Styles pour le message de mise du joueur */
-.player-bet {
-  font-weight: bold;
-  color: #2a9d8f; /* Couleur sarcelle pour la mise */
-  background-color: #4a5a5a; /* Fond foncé */
-  padding: 1px 6px; /* Ajuste le padding */
-  border-radius: 3px;
-  font-size: 0.85em;
-  display: inline-block; /* Pour que le background s'ajuste */
-  margin-top: 4px; /* Espace au-dessus */
-}
-
-/* Styles pour marquer les gagnants dans la liste des joueurs */
-.player-list li.winner {
-  border-left: 5px solid gold; /* Bordure dorée sur la gauche */
-  background-color: #5a5030; /* Fond légèrement doré/brun */
-  transition: background-color 0.5s ease, border-left 0.5s ease; /* Ajout de transition */
-}
-.player-list li.winner strong {
-  color: gold; /* Pseudo en doré */
-}
-.player-list li.winner .player-info span {
-    color: #ccc; /* Autres infos en gris clair */
-}
-
-
-/* Styles pour afficher le nom de la main gagnante à côté du nom du joueur */
-.player-hand-name {
-  font-style: italic;
-  color: #ccc; /* Texte gris clair */
-  font-size: 0.9em;
-  margin-left: 10px;
-  display: inline-block;
-  background-color: rgba(255, 193, 7, 0.1); /* Léger fond jaune translucide */
-  padding: 1px 5px;
-  border-radius: 3px;
-}
-
-
-/* NOUVEAUX STYLES POUR LA SECTION RÉSULTATS DU SHOWDOWN */
-.showdown-results {
-  margin-top: 20px;
-  padding: 15px;
-  border: 2px solid #ffc107; /* Bordure jaune pour un aspect "événement spécial" */
-  background-color: #4a4e57; /* Fond foncé similaire aux cartes communes */
-  border-radius: 8px;
-  text-align: center;
-  margin-bottom: 20px; /* Espace sous les résultats */
-}
-
-.showdown-results h3 {
-  margin-top: 0;
-  color: #ffc107; /* Couleur jaune/orange pour le titre */
-  font-size: 1.3em;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #555; /* Séparateur léger */
-  padding-bottom: 8px;
-}
-
-.showdown-results p {
-  margin: 8px 0;
-  font-size: 1.1em;
-  color: #f0f0f0; /* Texte clair */
-}
-
-.showdown-results strong {
-   color: gold; /* Nom de la main gagnante en doré */
-   font-weight: bold;
-}
-
-/* Styles pour la section "Prochaine Main" après le showdown - SUPPRIMÉS */
-/*
-.next-hand-section {
-    text-align: center;
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #4a4e57;
-    border: 1px solid #555;
-    border-radius: 5px;
-    color: #ccc;
-    font-size: 0.9em;
-}
-*/
-
-/* AJOUT pour le bouton All-in */
-.allin-button {
-  background-color: #dc3545; /* Rouge */
-  color: white;
-  font-weight: bold;
-  padding: 8px 12px; /* Similaire aux autres boutons d'action */
-}
-.allin-button:hover:not(:disabled) {
-  background-color: #c82333;
-}
-/* client/src/App.css */
-
-/* ... (existing styles) ... */
-
-/* --- NEW STYLES FOR SHOWDOWN --- */
-
-/* Showdown Results Section */
-.showdown-results {
-  margin-top: 20px;
-  padding: 15px;
-  border: 2px solid #ffc107; /* Orange/Yellow border */
-  background-color: #4a4e57;
-  border-radius: 8px;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.showdown-results h3 {
-  margin-top: 0;
-  color: #ffc107;
-  font-size: 1.3em;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #555;
-  padding-bottom: 8px;
-}
-
-.showdown-results p {
-  margin: 8px 0;
-  font-size: 1.1em;
-  color: #f0f0f0;
-}
-
-.showdown-results strong {
-   color: gold;
-   font-weight: bold;
-}
-
-/* Showdown Reveal Order List */
-.showdown-reveal-order {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px dashed #666; /* Separator */
-    text-align: left; /* Align list left */
-}
-
-.showdown-reveal-order h4 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    color: #ccc; /* Lighter grey */
-    font-size: 1em;
-    text-align: center; /* Center title */
-}
-
-.showdown-reveal-order ol {
-    list-style: none; /* No default numbers */
-    counter-reset: reveal-counter; /* Start counter */
-    padding: 0;
-    margin: 0;
-}
-
-.showdown-reveal-order li {
-    counter-increment: reveal-counter; /* Increment counter for each list item */
-    margin-bottom: 10px;
-    padding-left: 30px; /* Space for custom number */
-    position: relative; /* For absolute positioning of counter */
-    background-color: #3a3e47; /* Darker background for list item */
-    border: 1px solid #555;
-    border-radius: 4px;
-    padding: 10px; /* Adjust padding */
-    display: flex; /* Use flex to align info and cards */
-    align-items: center; /* Center vertically */
-    flex-wrap: wrap; /* Allow content to wrap */
-}
-
-.showdown-reveal-order li::before {
-    content: counter(reveal-counter) ". "; /* Display the counter */
-    position: absolute;
-    left: 5px; /* Position the number */
-    top: 10px; /* Align with text */
-    font-weight: bold;
-    color: #61dafb; /* Color the number */
-}
-
-.showdown-reveal-order li strong {
-    margin-right: 5px;
-    color: #f0f0f0; /* White/light grey for player name */
-}
-
-.showdown-reveal-order li span {
-    font-size: 0.9em; /* Smaller text for descriptions */
-    color: #ccc; /* Light grey for status/desc text */
-    margin-right: 10px; /* Space between elements */
-}
-
-.showdown-reveal-order li .player-hole-cards {
-    margin-left: auto; /* Push cards to the right */
-    flex-shrink: 0; /* Prevent cards from shrinking */
-    min-width: 90px; /* Ensure space for cards */
-}
-
-/* Style for mucked text */
-.mucked-text {
-    font-style: italic;
-    color: #aaa; /* Grey */
-}
-/* Style for hand name text */
-.hand-text {
-    color: #2a9d8f; /* Teal color */
-    font-weight: bold;
-}
-/* Style for winner text */
-.winner-text {
-    color: gold; /* Gold color */
-    font-weight: bold;
-}
-.winner-indicator {
-    color: gold;
-    font-weight: bold;
-    margin-left: 5px;
-}
-
-
-/* Style for small cards in showdown reveal */
-.showdown-reveal-order li .player-hole-cards.small-cards .card {
-    width: 30px; /* Smaller width */
-    height: 45px; /* Smaller height */
-    font-size: 12px; /* Smaller font */
-    border-radius: 3px; /* Smaller border-radius */
-    box-shadow: 0.5px 0.5px 2px rgba(0,0,0,0.3);
-}
-.showdown-reveal-order li .player-hole-cards.small-cards .card .rank { top: 1px; left: 2px; }
-.showdown-reveal-order li .player-hole-cards.small-cards .card .suit { bottom: 1px; right: 2px; font-size: 14px; }
-
-
-/* Style for the 'MUCK' card visual */
-.card.mucked {
-    background-color: #555; /* Dark grey */
-    color: #ddd; /* Lighter grey text */
-    font-size: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    font-weight: normal;
-    width: 45px; /* Match normal card size */
-    height: 65px;
-}
-.showdown-reveal-order li .player-hole-cards.small-cards .card.mucked {
-    width: 30px; /* Match small card size */
-    height: 45px;
-    font-size: 8px;
-}
-
-
-/* Styles for player list items during showdown */
-.player-list li.mucked {
-    opacity: 0.7; /* Slightly dim mucked players */
-    border-color: #777;
-}
-.player-list li.winner {
-  border-left-color: gold; /* Keep border color */
-  background-color: #4d452f; /* Slightly darker gold/brown background */
-  transition: background-color 0.5s ease, border-left 0.5s ease;
-}
-.player-list li.winner strong {
-  color: gold;
-}
-.player-list li.winner .player-info span {
-    color: #ccc;
-}
-.player-list li .player-hand-name {
-    /* Ensure hand name is always inline in list view if visible */
-     display: inline-block;
-     margin-left: 10px;
-}
-
-
-/* Add styling for tables in progress */
-.table-list li.table-in-progress {
-    border-left: 5px solid #ffc107; /* Orange indicator */
-}
-
-/* Adjust input number step to allow decimals */
-input[type="number"] {
-    /* existing styles */
-    -moz-appearance: textfield; /* Remove default arrows in Firefox */
-}
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none; /* Remove default arrows in Chrome/Safari */
-    margin: 0;
-}
-/* client/src/App.css */
-
 /* General styles */
 body {
   margin: 0;
@@ -828,20 +11,21 @@ body {
   display: flex; /* Use flexbox for basic layout of body */
   flex-direction: column;
   align-items: center; /* Center content horizontally */
+  overflow-y: auto; /* Allow scrolling if content overflows */
 }
 
 .App {
-text-align: center;
-padding: 20px;
-max-width: 1200px; /* Increased max width to fit more content */
-margin: 0 auto;
-flex-grow: 1; /* App takes available space vertically */
-width: 100%; /* Use full width up to max-width */
-box-sizing: border-box;
-display: flex; /* Use flexbox for App content */
-flex-direction: column; /* Stack title, error, main content */
-align-items: center;
-gap: 20px; /* Space between sections */
+  text-align: center;
+  padding: 20px;
+  max-width: 1200px; /* Increased max width to fit more content side-by-side */
+  margin: 0 auto;
+  flex-grow: 1; /* App takes available space vertically */
+  width: 100%; /* Use full width up to max-width */
+  box-sizing: border-box;
+  display: flex; /* Use flexbox for App content */
+  flex-direction: column; /* Stack title, error, main content by default */
+  align-items: center; /* Center items when stacked */
+  gap: 20px; /* Space between sections */
 }
 
 .App h1 {
@@ -857,11 +41,15 @@ gap: 20px; /* Space between sections */
 
 /* Forms */
 .username-form, .message-form {
-margin-top: 15px;
-display: flex;
-justify-content: center;
-align-items: center;
-gap: 10px;
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%; /* Allow forms to take full width in their container */
+  max-width: 400px; /* Limit form width */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .username-form h2 {
@@ -873,13 +61,13 @@ gap: 10px;
 
 input[type="text"],
 input[type="number"] {
-padding: 10px;
-border: 1px solid #555;
-border-radius: 4px;
-font-size: 1rem;
-background-color: #3a3e47;
-color: #f0f0f0;
-box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #3a3e47;
+  color: #f0f0f0;
+  box-sizing: border-box;
 }
 
 input[type="text"]::placeholder,
@@ -899,72 +87,73 @@ input[type="number"]::-webkit-inner-spin-button {
 
 
 button {
-padding: 10px 15px;
-cursor: pointer;
-background-color: #007bff;
-color: white;
-border: none;
-border-radius: 4px;
-font-size: 1rem;
-transition: background-color 0.2s ease;
+  padding: 10px 15px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
 }
 
 button:disabled {
-background-color: #6c757d; /* Gris bootstrap secondary */
-cursor: not-allowed;
-opacity: 0.65;
+  background-color: #6c757d; /* Gris bootstrap secondary */
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 button:hover:not(:disabled) {
-background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 .error-message {
-color: #dc3545;
-font-weight: bold;
-margin-top: 10px;
-background-color: rgba(220, 53, 69, 0.2);
-padding: 8px;
-border-radius: 4px;
+  color: #dc3545;
+  font-weight: bold;
+  margin-top: 10px;
+  background-color: rgba(220, 53, 69, 0.2);
+  padding: 8px;
+  border-radius: 4px;
 }
 
 /* Chat Box */
 .chat-box {
-border: 1px solid #555;
-padding: 15px;
-/* Removed top margin here, it will be handled by main-content gap */
-/* margin-top: 30px; */
-max-width: 400px; /* Adjusted width for right panel */
-width: 100%; /* Make it responsive up to max-width */
-/* Removed auto margins */
-background-color: #3a3e47;
-border-radius: 8px;
-display: flex;
-flex-direction: column;
-flex-shrink: 0; /* Prevent chat from shrinking */
+  border: 1px solid #555;
+  padding: 15px;
+  /* Removed top margin here, it will be handled by main-content gap */
+  /* margin-top: 30px; */
+  max-width: 400px; /* Adjusted width for right panel */
+  width: 100%; /* Make it responsive up to max-width */
+  /* Removed auto margins */
+  background-color: #3a3e47;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0; /* Prevent chat from shrinking */
+  box-sizing: border-box; /* Include padding/border in width */
 }
 
 .chat-box h2 {
-margin-top: 0;
-border-bottom: 1px solid #555;
-padding-bottom: 10px;
-color: #f0f0f0;
+  margin-top: 0;
+  border-bottom: 1px solid #555;
+  padding-bottom: 10px;
+  color: #f0f0f0;
 }
 
 .messages {
-height: 300px; /* Fixed height for scroll */
-overflow-y: auto;
-border: 1px solid #555;
-margin-bottom: 15px;
-padding: 10px;
-text-align: left;
-background-color: #282c34;
-border-radius: 4px;
-display: flex;
-flex-direction: column;
-color: #ccc;
-word-wrap: break-word; /* Ensure long words wrap */
-white-space: pre-wrap; /* Preserve whitespace and wrap text */
+  height: 300px; /* Fixed height for scroll */
+  overflow-y: auto;
+  border: 1px solid #555;
+  margin-bottom: 15px;
+  padding: 10px;
+  text-align: left;
+  background-color: #282c34;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  color: #ccc;
+  word-wrap: break-word; /* Ensure long words wrap */
+  white-space: pre-wrap; /* Preserve whitespace and wrap text */
 }
 
 .messages p {
@@ -973,18 +162,18 @@ white-space: pre-wrap; /* Preserve whitespace and wrap text */
 }
 
 .system-message {
-color: #aaa;
-font-style: italic;
-text-align: center;
-font-size: 0.9em;
+  color: #aaa;
+  font-style: italic;
+  text-align: center;
+  font-size: 0.9em;
 }
 
 .system-error-message {
-color: #dc3545;
-font-style: italic;
-font-weight: bold;
-text-align: center;
-font-size: 0.9em;
+  color: #dc3545;
+  font-style: italic;
+  font-weight: bold;
+  text-align: center;
+  font-size: 0.9em;
 }
 
 .user-message strong {
@@ -992,7 +181,7 @@ font-size: 0.9em;
 }
 
 .messages div:last-child {
-margin-top: auto;
+  margin-top: auto;
 }
 
 .chat-box .message-form {
@@ -1007,50 +196,53 @@ margin-top: auto;
 /* Lobby and Create Table Styles */
 
 .main-content {
-display: flex; /* Use flexbox for main sections (lobby/table + chat) */
-flex-direction: column; /* Stack by default for smaller screens */
-gap: 20px; /* Space between sections */
-margin-top: 0; /* Handled by App gap */
-width: 100%; /* Take full width of App */
-flex-grow: 1; /* Allow main content to grow */
+  display: flex; /* Use flexbox for main sections (lobby/table + chat) */
+  flex-direction: column; /* Stack by default for smaller screens */
+  gap: 20px; /* Space between sections */
+  margin-top: 0; /* Handled by App gap */
+  width: 100%; /* Take full width of App */
+  flex-grow: 1; /* Allow main content to grow */
+  align-items: flex-start; /* Align items to the start (top) */
 }
 
 .lobby {
-border: 1px solid #61dafb;
-padding: 20px;
-border-radius: 8px;
-background-color: #3a3e47;
-flex-grow: 1; /* Allow lobby to grow */
-display: flex; /* Use flex for internal layout */
-flex-direction: column;
+  border: 1px solid #61dafb;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #3a3e47;
+  flex-grow: 1; /* Allow lobby to grow */
+  display: flex; /* Use flex for internal layout */
+  flex-direction: column;
+  width: 100%; /* Take full width when stacked */
+  box-sizing: border-box;
 }
 
 .lobby h2, .lobby h3 {
-margin-top: 0;
-color: #61dafb;
-border-bottom: 1px solid #555;
-padding-bottom: 10px;
-margin-bottom: 15px;
+  margin-top: 0;
+  color: #61dafb;
+  border-bottom: 1px solid #555;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .table-list {
-list-style: none;
-padding: 0;
-margin-bottom: 20px;
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
 }
 
 .table-list li {
-background-color: #282c34;
-border: 1px solid #555;
-padding: 10px 15px;
-margin-bottom: 10px;
-border-radius: 4px;
-display: flex;
-justify-content: space-between;
-align-items: center;
-color: #f0f0f0;
-/* Added style for tables in progress */
-border-left: 5px solid transparent; /* Default border-left */
+  background-color: #282c34;
+  border: 1px solid #555;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #f0f0f0;
+  /* Added style for tables in progress */
+  border-left: 5px solid transparent; /* Default border-left */
 }
 
 /* Style for tables in progress (added in App.js class list) */
@@ -1060,15 +252,16 @@ border-left: 5px solid transparent; /* Default border-left */
 
 
 .table-list li span {
-font-weight: bold;
-margin-right: 10px; /* Space between text and button */
-flex-grow: 1; /* Allow text to take space */
+  font-weight: bold;
+  margin-right: 10px; /* Space between text and button */
+  flex-grow: 1; /* Allow text to take space */
+  text-align: left; /* Align table info left */
 }
 
 .table-list button {
-padding: 5px 10px;
-font-size: 0.9rem;
-background-color: #28a745; /* Green for join */
+  padding: 5px 10px;
+  font-size: 0.9rem;
+  background-color: #28a745; /* Green for join */
 }
 .table-list button:hover:not(:disabled) {
   background-color: #218838;
@@ -1079,62 +272,64 @@ background-color: #28a745; /* Green for join */
 
 
 .create-table-form {
-margin-top: auto; /* Push to the bottom of the lobby flex container */
-padding-top: 20px;
-border-top: 1px dashed #555;
-text-align: center; /* Center the form content */
+  margin-top: auto; /* Push to the bottom of the lobby flex container */
+  padding-top: 20px;
+  border-top: 1px dashed #555;
+  text-align: center; /* Center the form content */
 }
 
 .create-table-form form div {
-margin-bottom: 15px;
-text-align: left;
-max-width: 400px;
-margin-left: auto;
-margin-right: auto;
-display: flex; /* Align label and input */
-align-items: center;
-gap: 10px;
+  margin-bottom: 15px;
+  text-align: left;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex; /* Align label and input */
+  align-items: center;
+  gap: 10px;
 }
 
 .create-table-form label {
-flex-shrink: 0; /* Prevent label from shrinking */
-width: 120px; /* Fixed width for labels */
-text-align: right;
-font-weight: bold;
-color: #f0f0f0;
+  flex-shrink: 0; /* Prevent label from shrinking */
+  width: 120px; /* Fixed width for labels */
+  text-align: right;
+  font-weight: bold;
+  color: #f0f0f0;
 }
 
 .create-table-form input[type="text"],
 .create-table-form input[type="number"] {
-flex-grow: 1; /* Input takes remaining space */
-width: auto; /* Override fixed width */
+  flex-grow: 1; /* Input takes remaining space */
+  width: auto; /* Override fixed width */
 }
 
 .create-table-form button {
-display: block;
-margin: 20px auto 0 auto;
+  display: block;
+  margin: 20px auto 0 auto;
 }
 
 /* Responsive layout for larger screens */
 @media (min-width: 900px) {
-.main-content {
-  flex-direction: row; /* Lobby/Table and Chat side by side */
-  align-items: stretch; /* Stretch items to fill height */
-}
-.lobby {
-  flex: 1; /* Lobby takes available width */
-}
-.chat-box {
-  flex: 0 0 350px; /* Fixed width for chat */
-  margin-top: 0;
-}
-.game-table-container {
-  flex: 1; /* Table container takes available width */
-  margin-right: 20px; /* Space between table and chat */
-  display: flex; /* Use flex for internal layout (info bar + table area + actions) */
-  flex-direction: column;
-  gap: 15px; /* Space between info bar, table area, actions */
-}
+  .main-content {
+    flex-direction: row; /* Lobby/Table and Chat side by side */
+    align-items: stretch; /* Stretch items to fill height */
+  }
+  .lobby {
+    flex: 1; /* Lobby takes available width */
+     max-width: none; /* Remove max width in row layout */
+  }
+  .chat-box {
+    flex: 0 0 350px; /* Fixed width for chat */
+    margin-top: 0;
+  }
+  .game-table-container {
+    flex: 1; /* Table container takes available width */
+    margin-right: 20px; /* Space between table and chat */
+    display: flex; /* Use flex for internal layout (info bar + table area + actions) */
+    flex-direction: column;
+    gap: 15px; /* Space between info bar, table area, actions */
+     max-width: none; /* Remove max width in row layout */
+  }
 }
 
 
@@ -1146,12 +341,18 @@ margin: 20px auto 0 auto;
   border-radius: 8px;
   background-color: #3a3e47;
   position: relative; /* Allows positioning elements inside using absolute */
+  box-sizing: border-box;
+  width: 100%; /* Take full width available in its container */
+  display: flex; /* Use flex for internal layout */
+  flex-direction: column;
+  align-items: center;
 }
 
 .table-info-bar {
   text-align: center;
   margin-bottom: 10px;
   color: #ccc;
+  width: 100%;
 }
 .table-info-bar h2 {
   margin: 0 0 5px 0;
@@ -1159,25 +360,26 @@ margin: 20px auto 0 auto;
   font-size: 1.5em;
 }
 .table-info-bar p {
-   margin: 0;
-   font-size: 1em;
-   color: #bbb;
+  margin: 0;
+  font-size: 1em;
+  color: #bbb;
 }
 
 
 .game-table-area {
   position: relative; /* Allows positioning players relative to this area */
-  width: 100%;
-  /* Use aspect ratio or fixed height for the table area */
-  padding-bottom: 60%; /* Maintain aspect ratio (e.g., 60% of width) */
-  min-height: 400px; /* Minimum height */
+  width: 95%; /* Make oval slightly smaller than container */
+  /* Adjust aspect ratio for a wider/taller oval */
+  padding-bottom: 65%; /* Increased from 60% for taller oval */
+  min-height: 350px; /* Minimum height */
   background-color: #0a4020; /* Green felt color */
-  border-radius: 50% / 30%; /* Create an oval shape */
+  border-radius: 50% / 35%; /* Create an oval shape (adjusted vertical radius) */
   border: 10px solid #5a4b30; /* Table rim color (brown/gold) */
   box-sizing: border-box; /* Include border in dimensions */
   display: flex; /* Use flexbox to center community cards/pot */
   justify-content: center;
   align-items: center;
+  flex-shrink: 0; /* Prevent oval from shrinking */
 }
 
 /* Player Seats List - Positioned absolutely around the table area */
@@ -1208,12 +410,12 @@ margin: 20px auto 0 auto;
   border: 1px solid #555;
   border-radius: 8px;
   padding: 5px; /* Reduced padding */
-  width: 120px; /* Fixed width for player area */
+  width: 110px; /* Adjusted width for player area */
   /* height: 100px; */ /* Height will adjust with content */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 4px; /* Reduced gap */
   text-align: center;
   color: #f0f0f0;
   font-size: 0.8em; /* Reduced font size */
@@ -1223,49 +425,53 @@ margin: 20px auto 0 auto;
 }
 
 /* Positioning for each seat (adjust top/left/transform based on your desired layout) */
-/* Example for a few seats (assuming 9 players max) */
+/* Example for 9 players */
 .player-seats .seat-1 { top: 85%; left: 50%; transform: translate(-50%, -50%); } /* Bottom center */
 .player-seats .seat-2 { top: 75%; left: 80%; transform: translate(-50%, -50%); } /* Bottom right */
-.player-seats .seat-3 { top: 40%; left: 95%; transform: translate(-50%, -50%); } /* Middle right */
-.player-seats .seat-4 { top: 15%; left: 80%; transform: translate(-50%, -50%); } /* Top right */
-.player-seats .seat-5 { top: 5%; left: 50%; transform: translate(-50%, -50%); } /* Top center */
-.player-seats .seat-6 { top: 15%; left: 20%; transform: translate(-50%, -50%); } /* Top left */
-.player-seats .seat-7 { top: 40%; left: 5%; transform: translate(-50%, -50%); } /* Middle left */
-.player-seats .seat-8 { top: 75%; left: 20%; transform: translate(-50%, -50%); } /* Bottom left */
-/* .player-seats .seat-9 { ... } */ /* Add more seats if needed */
+.player-seats .seat-3 { top: 55%; left: 92%; transform: translate(-50%, -50%); } /* Mid-right */
+.player-seats .seat-4 { top: 30%; left: 92%; transform: translate(-50%, -50%); } /* Upper-right */
+.player-seats .seat-5 { top: 15%; left: 70%; transform: translate(-50%, -50%); } /* Top right */
+.player-seats .seat-6 { top: 5%; left: 50%; transform: translate(-50%, -50%); } /* Top center */
+.player-seats .seat-7 { top: 15%; left: 30%; transform: translate(-50%, -50%); } /* Top left */
+.player-seats .seat-8 { top: 30%; left: 8%; transform: translate(-50%, -50%); } /* Upper-left */
+.player-seats .seat-9 { top: 55%; left: 8%; transform: translate(-50%, -50%); } /* Mid-left */
+/* .player-seats .seat-10 { ... } */ /* Add for 10 players if needed */
 
 
 /* Style for empty seats */
 .player-seats li.empty {
-   border: 1px dashed #555;
-   background-color: #4a4e57;
-   color: #bbb;
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   font-style: italic;
+  border: 1px dashed #555;
+  background-color: #4a4e57;
+  color: #bbb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-style: italic;
 }
-.player-seats li.empty .player-area, /* Hide player area content for empty seats */
-.player-seats li.empty .player-avatar,
-.player-seats li.empty .player-info-block,
-.player-seats li.empty .player-hole-cards,
-.player-seats li.empty .player-bet-chips,
-.player-seats li.empty .dealer-button {
+.player-seats li.empty .player-area { /* Hide player area content for empty seats */
   display: none;
 }
+.player-seats li.empty .empty-seat {
+  display: flex; /* Show the empty seat text */
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
 
 /* Styling for player info inside the seat */
 .player-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 4px; /* Reduced gap */
   width: 100%; /* Take full width of the li */
 }
 
 .player-avatar {
-  width: 40px; /* Placeholder size */
-  height: 40px;
+  width: 35px; /* Adjusted size */
+  height: 35px;
   background-color: #61dafb; /* Placeholder color */
   border-radius: 50%; /* Circle avatar */
   border: 2px solid #fff;
@@ -1280,7 +486,7 @@ margin: 20px auto 0 auto;
 }
 
 .player-name strong {
-  font-size: 1.1em;
+  font-size: 1em; /* Adjusted font size */
   color: #61dafb; /* Player name color */
 }
 .player-status {
@@ -1296,12 +502,12 @@ margin: 20px auto 0 auto;
 
 /* Player Status Classes */
 .player-seats li.folded {
-opacity: 0.6;
-background-color: #444;
+  opacity: 0.6;
+  background-color: #444;
 }
 .player-seats li.all-in {
- border-color: #ffc107;
- box-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
+  border-color: #ffc107;
+  box-shadow: 0 0 5px rgba(255, 193, 7, 0.3);
 }
 .player-seats li.sitting-out {
   font-style: italic;
@@ -1315,17 +521,17 @@ background-color: #444;
 }
 
 .player-seats li.current-turn {
-border: 2px solid #ffc107;
-background-color: #5a4b30;
-box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+  border: 2px solid #ffc107;
+  background-color: #5a4b30;
+  box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
 }
 
 .player-seats li.winner {
-border-color: gold; /* Highlight winner border */
-background-color: #5a5030; /* Slightly golden background */
+  border-color: gold; /* Highlight winner border */
+  background-color: #5a5030; /* Slightly golden background */
 }
 .player-seats li.winner strong {
-color: gold; /* Winner name gold */
+  color: gold; /* Winner name gold */
 }
 
 /* Mucked status class for player list item */
@@ -1338,45 +544,45 @@ color: gold; /* Winner name gold */
 
 /* Player Hole Cards */
 .player-hole-cards {
-min-width: 90px; /* Space for 2 cards */
-display: flex;
-justify-content: center; /* Center cards within the player area */
-gap: 4px;
-margin-top: 5px; /* Space below info */
+  min-width: 80px; /* Space for 2 cards */
+  display: flex;
+  justify-content: center; /* Center cards within the player area */
+  gap: 3px; /* Reduced gap */
+  margin-top: 4px; /* Space below info */
 }
 .player-hole-cards .card {
-  width: 40px; /* Adjusted size */
-  height: 55px;
-  font-size: 14px;
+  width: 35px; /* Adjusted size */
+  height: 50px;
+  font-size: 12px; /* Adjusted font size */
 }
 .player-hole-cards .card .rank { top: 1px; left: 3px; }
-.player-hole-cards .card .suit { bottom: 1px; right: 3px; font-size: 16px; }
+.player-hole-cards .card .suit { bottom: 1px; right: 3px; font-size: 14px; }
 
 .player-hole-cards.empty { min-width: 0; gap: 0; margin-top: 5px; }
 
 
-/* Player Bet Chips (Placeholder) */
+/* Player Bet Chips */
 .player-bet-chips {
   position: absolute; /* Position near the player area */
-  bottom: -15px; /* Example positioning */
+  bottom: -12px; /* Adjusted positioning */
   left: 50%;
   transform: translateX(-50%);
   background-color: #2a9d8f; /* Teal/Chip color */
   color: white;
-  font-size: 0.9em;
+  font-size: 0.8em; /* Adjusted font size */
   font-weight: bold;
-  padding: 2px 6px;
-  border-radius: 12px; /* Chip shape */
+  padding: 1px 5px; /* Adjusted padding */
+  border-radius: 10px; /* Chip shape */
   border: 1px solid #fff;
   z-index: 10; /* Ensure chips are above the table */
-  min-width: 25px; /* Ensure it fits small amounts */
+  min-width: 20px; /* Ensure it fits small amounts */
   text-align: center;
 }
 /* Adjust chip position per seat if needed (complex) */
 /* .seat-1 .player-bet-chips { bottom: 10px; } */
 
 
-/* Dealer Button (Placeholder) */
+/* Dealer Button */
 .dealer-button {
   position: absolute;
   width: 20px;
@@ -1411,16 +617,16 @@ margin-top: 5px; /* Space below info */
 }
 
 .community-cards {
-min-height: 65px; /* Space for cards */
-background-color: #4a4e57;
-padding: 8px;
-border-radius: 5px;
-border: 1px solid #555;
-text-align: center;
-display: flex; /* Layout cards horizontally */
-gap: 8px; /* Space between community cards */
-justify-content: center;
-align-items: center;
+  min-height: 50px; /* Space for cards */
+  background-color: #4a4e57;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #555;
+  text-align: center;
+  display: flex; /* Layout cards horizontally */
+  gap: 8px; /* Space between community cards */
+  justify-content: center;
+  align-items: center;
 }
 .community-cards p { margin: 0; font-size: 0.9em; color: #ccc; }
 .community-cards .card {
@@ -1439,27 +645,27 @@ align-items: center;
 
 /* Game Actions Area (Bottom Bar) */
 .game-actions {
-margin-top: auto; /* Push to the bottom of the game-table-container flex */
-padding: 15px;
-border-top: 1px dashed #555;
-border-bottom: none; /* No bottom border here */
-margin-bottom: 0;
-min-height: 50px;
-background-color: #3a3e47;
-border-radius: 5px;
-display: flex; /* Layout buttons horizontally */
-justify-content: center;
-align-items: center;
-flex-wrap: wrap; /* Allow buttons to wrap */
-gap: 10px; /* Space between buttons */
+  margin-top: auto; /* Push to the bottom of the game-table-container flex */
+  padding: 15px;
+  border-top: 1px dashed #555;
+  border-bottom: none; /* No bottom border here */
+  margin-bottom: 0;
+  min-height: 60px; /* Increased height to accommodate wrap */
+  background-color: #3a3e47;
+  border-radius: 5px;
+  display: flex; /* Layout buttons horizontally */
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap; /* Allow buttons to wrap */
+  gap: 10px; /* Space between buttons */
 }
 
 .game-actions h4 {
-margin: 0 20px 0 0; /* Space on the right */
-text-align: center;
-color: #ffc107;
-font-size: 1em; /* Smaller title */
-flex-shrink: 0; /* Prevent title from shrinking */
+  margin: 0 20px 0 0; /* Space on the right */
+  text-align: center;
+  color: #ffc107;
+  font-size: 1em; /* Smaller title */
+  flex-shrink: 0; /* Prevent title from shrinking */
 }
 
 .game-actions p {
@@ -1471,220 +677,87 @@ flex-shrink: 0; /* Prevent title from shrinking */
 }
 
 .game-actions button {
-margin: 0; /* Remove default margin if using gap */
-padding: 8px 12px;
+  margin: 0; /* Remove default margin if using gap */
+  padding: 8px 12px;
 }
 
 .bet-raise-section {
-margin-top: 0; /* Remove top margin */
-padding-top: 0; /* Remove padding */
-border-top: none; /* Remove border */
-display: flex;
-align-items: center;
-gap: 10px;
-justify-content: center;
-flex-wrap: wrap;
+  margin-top: 0; /* Remove top margin */
+  padding-top: 0; /* Remove padding */
+  border-top: none; /* Remove border */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .bet-input {
-width: 80px; /* Adjusted width */
-padding: 8px;
-text-align: right;
+  width: 80px; /* Adjusted width */
+  padding: 8px;
+  text-align: right;
 }
 
 .game-actions button:disabled {
-background-color: #6c757d;
-cursor: not-allowed;
-opacity: 0.65;
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 /* Start Game Section */
 .start-game-section {
-text-align: center;
-margin: 20px 0;
-padding: 15px;
-background-color: #4a4e57;
-border: 1px solid #555;
-border-radius: 5px;
+  text-align: center;
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #4a4e57;
+  border: 1px solid #555;
+  border-radius: 5px;
 }
 
 .start-game-button {
-padding: 12px 25px;
-font-size: 1.1em;
-background-color: #28a745;
+  padding: 12px 25px;
+  font-size: 1.1em;
+  background-color: #28a745;
 }
 
 .start-game-button:hover:not(:disabled) {
-background-color: #218838;
+  background-color: #218838;
 }
 
 /* Leave Button */
 .leave-button {
-background-color: #dc3545;
-color: white;
-padding: 10px 15px;
-border: none;
-border-radius: 4px;
-cursor: pointer;
-font-size: 1rem;
-margin-top: 15px;
+  background-color: #dc3545;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 15px;
 }
 
 .leave-button:hover:not(:disabled) {
-background-color: #c82333;
+  background-color: #c82333;
 }
 
-
-/* Showdown Results Section Styles (refined) */
-.showdown-results {
-/* Existing styles */
-background-color: #3a3e47; /* Darker background */
-border: 1px solid #ffc107; /* Orange/Yellow border */
-color: #f0f0f0;
-margin-bottom: 20px; /* Space below */
-}
-
-.showdown-results h3 {
- color: #ffc107;
- border-bottom-color: #666; /* Lighter separator */
-}
-.showdown-results p {
- color: #ccc; /* Light grey text */
- font-size: 1em; /* Default font size */
-}
-
-.showdown-results strong {
- color: gold; /* Gold color for important text like winning hand name */
-}
-
-/* Showdown Reveal Order List (refined) */
-.showdown-reveal-order {
-  margin-top: 20px;
-  padding-top: 15px;
-  border-top: 1px dashed #666;
-  text-align: left;
-}
-
-.showdown-reveal-order h4 {
-  color: #ccc;
-  font-size: 1em;
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.showdown-reveal-order ol {
-  list-style: none;
-  counter-reset: reveal-counter;
-  padding: 0;
-  margin: 0;
-}
-
-.showdown-reveal-order li {
-  counter-increment: reveal-counter;
-  margin-bottom: 10px;
-  padding: 10px; /* Adjusted padding */
-  background-color: #282c34; /* Dark background for list item */
-  border: 1px solid #555;
-  border-radius: 4px;
-  display: flex; /* Use flex to align info and cards */
-  align-items: center;
-  flex-wrap: wrap; /* Allow content to wrap */
-  position: relative;
-}
-
-.showdown-reveal-order li::before {
-  content: counter(reveal-counter) ". ";
-  position: absolute;
-  left: 5px;
-  top: 10px;
-  font-weight: bold;
-  color: #61dafb;
-}
-/* Adjust content padding to make space for number */
-.showdown-reveal-order li > strong {
-  padding-left: 20px; /* Add padding to strong or another inner div */
-}
-/* Alternative: add padding to the li and adjust before position */
-/* li { padding-left: 30px; position: relative; } li::before { left: 5px; top: 50%; transform: translateY(-50%);} */
-
-
-.showdown-reveal-order li strong {
-  margin-right: 5px;
-  color: #f0f0f0;
-  font-size: 1em; /* Reset font size */
-}
-
-.showdown-reveal-order li span {
-  font-size: 0.9em;
-  color: #ccc;
-  margin-right: 10px;
-}
-
-.showdown-reveal-order li .player-hole-cards {
-  margin-left: auto; /* Push cards to the right */
-  flex-shrink: 0;
-  /* Removed min-width here, controlled by card size */
-  margin-top: 0; /* Align cards vertically */
-}
-
-/* Style for small cards in showdown reveal */
-.player-hole-cards.small-cards .card {
-  width: 30px;
-  height: 45px;
-  font-size: 12px;
-  border-radius: 3px;
-  box-shadow: 0.5px 0.5px 2px rgba(0,0,0,0.3);
-}
-.player-hole-cards.small-cards .card .rank { top: 1px; left: 2px; }
-.player-hole-cards.small-cards .card .suit { bottom: 1px; right: 2px; font-size: 14px; }
-
-
-/* Style for the 'MUCK' card visual */
-.card.mucked {
-  background-color: #555;
-  color: #ddd;
-  font-size: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  font-weight: normal;
-  width: 45px;
-  height: 65px;
-}
-.player-hole-cards.small-cards .card.mucked {
-  width: 30px;
-  height: 45px;
-  font-size: 8px;
-}
 
 /* Styles for player list items during showdown */
 /* Faded/mucked style applied via li class */
-.player-list li.mucked {
+.player-seats li.mucked {
   opacity: 0.5;
   border-color: #777;
   background-color: #4a4a4a;
 }
-.player-list li.winner {
-border-left-color: gold;
-background-color: #4d452f;
+.player-seats li.winner {
+  border-color: gold;
+  background-color: #4d452f;
 }
-.player-list li.winner strong {
-color: gold;
+.player-seats li.winner strong {
+  color: gold;
 }
-.player-list li.winner .player-info span {
-  color: #ccc;
-}
-.player-list li .player-hand-name {
-   display: inline-block;
-   margin-left: 10px;
-   font-style: italic;
-   color: #ccc;
-   font-size: 0.9em;
-}
-.player-list li .mucked-status {
-  font-style: italic;
-  color: #aaa;
+/* Hide hand name next to player name, it's now in chat */
+.player-seats li .player-hand-name {
+   display: none !important; /* Hide the element completely */
 }
 
 .winner-indicator {
@@ -1692,6 +765,9 @@ color: gold;
   font-weight: bold;
   margin-left: 5px;
 }
+
+/* Style for the 'MUCK' card visual */
+/* Uses existing .card.mucked style from previous CSS */
 
 /* Add some basic styling for the empty seat div */
 .empty-seat {
