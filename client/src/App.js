@@ -11,11 +11,15 @@ function Card({ card }) {
     const suitSymbols = { s: '♠', h: '♥', d: '♦', c: '♣' };
     const rank = card.substring(0, card.length - 1);
     const suit = card.substring(card.length - 1);
+    // Use Pokersolver ranks 'T', 'J', 'Q', 'K', 'A' directly if present
+    const displayRank = rank === 'T' ? '10' : rank; // Display '10' instead of 'T'
+
+
     const color = (suit === 'h' || suit === 'd') ? 'red' : 'black';
 
     return (
         <div className={`card suit-${suit} color-${color}`}>
-            <span className="rank">{rank}</span>
+            <span className="rank">{displayRank}</span>
             <span className="suit">{suitSymbols[suit]}</span>
         </div>
     );
@@ -27,15 +31,17 @@ function PlayerCards({ player, isSelf }) {
     // Determine if cards should be displayed face up
     // 1. If it's the current user (isSelf)
     // 2. If the game is in showdown/complete stage AND player's showdownInfo exists and says to 'show' their hand
-    const isShowdownVisible = player?.showdownInfo; // Check if showdown info is present for this player
-    const shouldShowFaceUp = isSelf || (isShowdownVisible && player.showdownInfo?.show === true);
+    const isShowdownPhase = player?.showdownInfo; // Check if showdown info is present for this player (implies showdown stage)
+    const shouldShowFaceUp = isSelf || (isShowdownPhase && player.showdownInfo?.show === true);
 
     // Determine if cards should be displayed as backs
-    // Server's `hasCards` property is true if player was dealt cards and didn't fold/sit out.
-    const shouldShowBacks = player?.hasCards && !shouldShowFaceUp && player?.statusInHand !== 'folded' && player?.statusInHand !== 'sitting_out';
+    // Server's `hasCards` property is true if player was dealt cards and didn't fold/sit out *initially*.
+    // We show backs if hasCards is true AND cards are not face up AND player is still in hand (not folded/sitting out)
+     const shouldShowBacks = player?.hasCards && !shouldShowFaceUp && player?.statusInHand !== 'folded' && player?.statusInHand !== 'sitting_out' && player?.statusInHand !== 'empty';
+
 
     // Check if player mucked their hand at showdown
-    const hasMucked = isShowdownVisible && player.showdownInfo?.show === false;
+    const hasMucked = isShowdownPhase && player.showdownInfo?.show === false;
 
 
     if (shouldShowFaceUp && player?.holeCards && player.holeCards.length === 2) {
@@ -46,7 +52,9 @@ function PlayerCards({ player, isSelf }) {
              </div>
          );
     } else if (hasMucked) {
-         // Explicitly show mucked state at showdown
+         // Explicitly show mucked state at showdown if the player *was* in showdownPlayers list
+         // The server sends showdownInfo for all players who reached showdown state, even if they muck.
+          // We only show the 'MUCK' visual if they reached showdown and explicitly mucked.
          return (
               <div className="player-hole-cards">
                   <div className="card mucked">MUCK</div> {/* Visual indicator for mucked */}
@@ -61,7 +69,7 @@ function PlayerCards({ player, isSelf }) {
             </div>
         );
     } else {
-        // Empty space if the player didn't have cards or is folded/sitting out
+        // Empty space if the player didn't have cards (e.g. joined late) or is folded/sitting out/empty seat
         return <div className="player-hole-cards empty"></div>;
     }
 }
@@ -69,30 +77,32 @@ function PlayerCards({ player, isSelf }) {
 
 // --- Player Seat Component ---
 // Represents a single player position around the table
-function PlayerSeat({ player, isCurrentUser, tableDetails, totalPlayers }) {
+function PlayerSeat({ player, isCurrentUser, tableDetails }) {
     // Determine player status class
     const playerStatusClass = player.statusInHand || ''; // Use statusInHand for classes
 
     // Check if it's this player's turn
     const isPlayerTurn = player.seat === tableDetails?.currentTurnSeat && tableDetails?.status === 'playing' && !(tableDetails?.stage?.includes('dealing')) && tableDetails?.stage !== 'showdown' && tableDetails?.stage !== 'showdown_complete';
 
-    // Get showdown info if available
-    const showdownPlayerInfo = player.showdownInfo;
-    const isWinner = showdownPlayerInfo?.isWinner; // Use showdownInfo if available
+    // Get showdown info if available and valid
+     const showdownPlayerInfo = player?.showdownInfo; // showdownInfo is null if not in showdown stage
+
 
     // Determine player list item class name
     const listItemClassName = [
         `seat-${player.seat}`, // Class for positioning based on seat number (requires CSS rules per seat)
         playerStatusClass,
         isPlayerTurn ? 'current-turn' : '',
-        isWinner ? 'winner' : '', // Apply winner class
-        (tableDetails?.stage === 'showdown_complete' || tableDetails?.status === 'finished') && showdownPlayerInfo?.show === false ? 'mucked' : '', // Add 'mucked' class during showdown stages if mucked
+        // Apply winner class ONLY during or after showdown if they are marked as winner
+        (tableDetails?.stage === 'showdown' || tableDetails?.stage === 'showdown_complete' || tableDetails?.status === 'finished') && showdownPlayerInfo?.isWinner ? 'winner' : '',
+         // Add 'mucked' class during showdown stages if mucked
+        (tableDetails?.stage === 'showdown' || tableDetails?.stage === 'showdown_complete' || tableDetails?.status === 'finished') && showdownPlayerInfo?.show === false ? 'mucked' : '',
         isCurrentUser ? 'current-user-seat' : '' // Special class for the current user's seat
     ].filter(Boolean).join(' ');
 
 
      // Determine if player info block should be visible (hide if seat is empty)
-     const isSeatOccupied = player && player.username; // Simple check if player object exists
+     const isSeatOccupied = player && player.statusInHand !== 'empty';
 
 
     return (
@@ -107,32 +117,26 @@ function PlayerSeat({ player, isCurrentUser, tableDetails, totalPlayers }) {
                              {player.username} {isCurrentUser ? '(Vous)' : ''}
                          </div>
                           <div className="player-status">
-                                {player.seat === tableDetails?.dealerSeat ? ' (D)' : ''}
+                                {/* Show Dealer button only when game is playing */}
+                                {tableDetails?.status === 'playing' && player.seat === tableDetails?.dealerSeat ? ' (D)' : ''}
                                 {player.statusInHand === 'all_in' ? ' (ALL-IN)' : ''}
                                 {player.statusInHand === 'sitting_out' ? ' (Sit Out)' : ''}
                                  {isPlayerTurn && !isCurrentUser ? ' (Action...)' : ''}
-                                 {/* Display hand name if shown at showdown */}
-                                  {(tableDetails?.stage === 'showdown_complete' || tableDetails?.status === 'finished') && showdownPlayerInfo?.show === true && showdownPlayerInfo.hand ? (
-                                       <span className="player-hand-name">({showdownPlayerInfo.hand.name})</span>
-                                  ) : null}
-                                   {(tableDetails?.stage === 'showdown_complete' || tableDetails?.status === 'finished') && showdownPlayerInfo?.show === false ? (
-                                        <span className="player-hand-name mucked-status">(Couche main)</span>
-                                   ) : null}
-                                    {isWinner && !(tableDetails?.stage === 'showdown_complete' || tableDetails?.status === 'finished') ? <span className="winner-indicator"> 🏆</span> : null} {/* Winner indicator outside of showdown hand name */}
+                                   {/* Display winner indicator ONLY during/after showdown if they are marked as winner */}
+                                    {(tableDetails?.stage === 'showdown' || tableDetails?.stage === 'showdown_complete' || tableDetails?.status === 'finished') && showdownPlayerInfo?.isWinner ? <span className="winner-indicator"> 🏆</span> : null}
                           </div>
                          <div className="player-stack">Stack: {player.stack}</div>
+                         {/* Player Bet (visible only when betting and > 0) */}
+                         {tableDetails?.status === 'playing' && tableDetails?.stage && tableDetails.stage.includes('_betting') && player.betInStage > 0 ? (
+                              <div className="player-bet-chips">{player.betInStage}</div> // Add chip styling later
+                         ) : null}
                      </div>
 
                      {/* Player Cards (handles face up/down based on state) */}
                      <PlayerCards player={player} isSelf={isCurrentUser} />
 
-                     {/* Player Bet (visible only when betting and > 0) */}
-                     {tableDetails?.status === 'playing' && tableDetails?.stage && tableDetails.stage.includes('_betting') && player.betInStage > 0 ? (
-                          <div className="player-bet-chips">{player.betInStage}</div> // Add chip styling later
-                     ) : null}
-
-                     {/* Dealer button */}
-                     {player.seat === tableDetails?.dealerSeat && tableDetails?.status === 'playing' ? (
+                     {/* Dealer button - Positioned absolutely on the li */}
+                     {tableDetails?.status === 'playing' && player.seat === tableDetails?.dealerSeat ? (
                          <div className="dealer-button">D</div> // Add styling
                      ) : null}
 
@@ -174,6 +178,7 @@ function App() {
     const messagesEndRef = useRef(null);
      const previousTableStateRef = useRef({ stage: null, status: null }); // Ref to track previous stage/status for chat messages
 
+
     // --- Constants ---
     const MIN_PLAYERS_TO_START = 2; // Must match server
 
@@ -186,7 +191,7 @@ function App() {
              messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
         });
     };
-    // Trigger scroll when messages change OR when the active table stage/status changes (for potential system messages)
+    // Trigger scroll when messages change OR when the active table stage/status changes (for potential system messages added by this effect)
     useEffect(() => {
          scrollToBottom();
     }, [messages, activeTableDetails?.stage, activeTableDetails?.status]);
@@ -205,7 +210,8 @@ function App() {
 
         socketRef.current = io(socketIoUrl, {
             reconnectionAttempts: 5,
-            reconnectionDelay: 1000
+            reconnectionDelay: 1000,
+             transports: ['websocket'] // Use websocket transport
         });
         const socket = socketRef.current;
 
@@ -232,13 +238,12 @@ function App() {
         });
 
         socket.on('connect_error', (err) => {
-            setError(`Erreur de connexion: ${err.message}`);
-            console.error('[CLIENT App.js] Socket Connect Error:', err);
-            // Use a ref for messages state access within this effect's closure
-             // eslint-disable-next-line react-hooks/exhaustive-deps
-             if (!messages.some(m => m.text?.includes('Erreur de connexion') && (Date.now() - new Date(m.timestamp || Date.now()).getTime() < 5000))) { // Check for recent similar message
-                 setMessages((prevMessages) => [...prevMessages, { system: true, error: true, text: `Erreur de connexion: ${err.message}` }]);
+            // Avoid flooding error messages on temporary connect errors
+            if (!error.includes('Erreur de connexion')) { // Simple check to avoid duplicates
+                 setError(`Erreur de connexion: ${err.message}`);
+                  setMessages((prevMessages) => [...prevMessages, { system: true, error: true, text: `Erreur de connexion: ${err.message}` }]);
             }
+            console.error('[CLIENT App.js] Socket Connect Error:', err);
         });
 
         socket.on('username_set', (newUsername) => {
@@ -271,9 +276,6 @@ function App() {
             }
         });
 
-        // Use a ref for previous state tracking to avoid unnecessary effect re-runs
-        // previousTableStateRef initialized outside the effect.
-
 
         socket.on('update_active_table', (details) => {
              console.log('>>> [CLIENT App.js] RECEIVED update_active_table:', details);
@@ -284,51 +286,101 @@ function App() {
                 const currentStage = details.stage;
                 const currentStatus = details.status;
 
-                // Update state FIRST so the rendering logic has the latest data
+                // Use functional update for messages to avoid dependency on 'messages' state in effect
+                 setMessages(prevMessages => {
+                     let newMessages = [...prevMessages];
+                      const timestamp = new Date().toISOString(); // Use consistent timestamp
+
+                     // --- Chat messages based on game progression ---
+                     // Only add system messages for transitions between stages/statuses
+                     if (previousStage !== currentStage || previousStatus !== currentStatus) {
+                          console.log(`Stage/Status Transition: ${previousStatus}/${previousStage} -> ${currentStatus}/${currentStage}`);
+
+                          // Transitions *into* playing state
+                          if ((previousStatus === 'waiting' || previousStatus === 'finished' || previousStatus === null) && currentStatus === 'playing') {
+                               newMessages = [...newMessages, { system: true, text: "Une nouvelle main commence.", timestamp }];
+                          }
+                          // Transitions into betting stages after dealing (dealing messages handled by server chat now)
+                          // Add messages for community cards dealt
+                          if (previousStage === 'dealing' && currentStage === 'preflop_blinds') { // Transition after dealing hole cards (before blinds)
+                                // No community cards yet
+                          } else if ((previousStage === 'preflop_betting' || previousStage === 'preflop_blinds') && currentStage === 'flop_betting') {
+                              if (details.communityCards && details.communityCards.length >= 3) {
+                                    newMessages = [...newMessages, { system: true, text: `Le Flop est distribué : [ ${details.communityCards.slice(0, 3).join(', ')} ]`, timestamp }];
+                              }
+                          } else if (previousStage === 'flop_betting' && currentStage === 'turn_betting') {
+                               if (details.communityCards && details.communityCards.length >= 4) {
+                                    newMessages = [...newMessages, { system: true, text: `Le Turn est distribué : [ ${details.communityCards.slice(3, 4).join(', ')} ]`, timestamp }];
+                               }
+                          } else if (previousStage === 'turn_betting' && currentStage === 'river_betting') {
+                               if (details.communityCards && details.communityCards.length >= 5) {
+                                    newMessages = [...newMessages, { system: true, text: `La River est distribuée : [ ${details.communityCards.slice(4, 5).join(', ')} ]`, timestamp }];
+                               }
+                          }
+                          // Transition to showdown (before results are shown)
+                          else if (previousStage && previousStage.includes('_betting') && currentStage === 'showdown') {
+                               newMessages = [...newMessages, { system: true, text: "Le tour de mise est terminé. Showdown !", timestamp }];
+                          }
+                          // Transition to showdown_complete (after results are calculated and distributed)
+                          else if ((previousStage === 'showdown' || (previousStage && previousStage.includes('_betting') && currentStage !== 'showdown')) && currentStage === 'showdown_complete') {
+                               // Results are now available - Add Showdown details to chat
+                              if (details.showdownResults) {
+                                   const winnerNames = Array.isArray(details.showdownResults.winners) ? details.showdownResults.winners.map(w => w.username).join(', ') : 'Aucun';
+                                   const winningHandName = details.showdownResults.winningHandName || 'N/A';
+                                   const winningHandDesc = details.showdownResults.winningHandDesc || 'No description';
+                                   const potWon = details.showdownResults.potWon ?? 0;
+
+                                  // Summary message
+                                  if (Array.isArray(details.showdownResults.winners) && details.showdownResults.winners.length > 0) {
+                                       const summaryText = winningHandName === "Wins by default"
+                                        ? `Main terminée. ${winnerNames} gagne par défaut (${winningHandDesc}). Pot total : ${potWon}.`
+                                        : `Main terminée. ${winnerNames} gagne${details.showdownResults.winners.length > 1 ? 'nt' : ''} avec un ${winningHandName} (${winningHandDesc}). Pot total : ${potWon}.`;
+                                        newMessages = [...newMessages, { system: true, text: summaryText, timestamp }];
+                                  } else {
+                                      newMessages = [...newMessages, { system: true, text: `Main terminée. Aucun gagnant déclaré. Pot total : ${potWon}.`, timestamp }];
+                                  }
+
+
+                                  // Detailed Showdown Reveal messages
+                                  if (Array.isArray(details.showdownResults.orderedShowdown) && details.showdownResults.orderedShowdown.length > 0) {
+                                      newMessages = [...newMessages, { system: true, text: "--- Révélation des mains ---", timestamp }]; // Header
+
+                                      details.showdownResults.orderedShowdown.forEach(sdPlayer => {
+                                          let revealText = `${sdPlayer.username} (S${sdPlayer.seat})`;
+                                          if (sdPlayer.show) {
+                                               const cardString = Array.isArray(sdPlayer.holeCards) ? `[${sdPlayer.holeCards.join(', ')}]` : '[]';
+                                               const handName = sdPlayer.hand?.name || 'Main inconnue';
+                                               const handDesc = sdPlayer.hand?.desc && handName !== sdPlayer.hand?.desc ? ` - ${sdPlayer.hand.desc}` : ''; // Add desc if different from name
+                                               revealText += ` montre ${cardString} (${handName}${handDesc}).`;
+                                               if (sdPlayer.isWinner) revealText += " Gagne le pot.";
+                                          } else {
+                                               revealText += ` couche sa main (${sdPlayer.muckReason || 'raison inconnue'}).`;
+                                          }
+                                          newMessages = [...newMessages, { system: true, text: revealText, timestamp }];
+                                      });
+                                  }
+                              } else {
+                                   // Fallback if no showdownResults despite showdown_complete
+                                    newMessages = [...newMessages, { system: true, text: `Main terminée (Showdown Complete). Pas de résultats détaillés disponibles.`, timestamp }];
+                              }
+                          } else if (currentStatus === 'waiting' && previousStatus !== 'waiting') {
+                               // Transition back to waiting (e.g., after hand finished and players remain)
+                               newMessages = [...newMessages, { system: true, text: "Table en attente de la prochaine main.", timestamp }];
+                          }
+                     }
+
+                     // Ensure we don't add duplicate messages by checking timestamp and text? Or just trust the logic above adds them once per transition.
+                     // For simplicity, just add the new messages generated by the transition logic.
+
+                    return newMessages; // Return the updated message array
+                 });
+
+
+                // Update state AFTER handling messages to ensure UI reacts to latest data
                 setActiveTableDetails(details);
                 setCurrentTableId(details.id);
                 setError('');
 
-                // --- Chat messages based on game progression ---
-                // Only add system messages for transitions between stages/statuses
-                if (previousStage !== currentStage || previousStatus !== currentStatus) {
-                     console.log(`Stage/Status Transition: ${previousStatus}/${previousStage} -> ${currentStatus}/${currentStage}`);
-
-                     // Transitions *into* playing state
-                     if ((previousStatus === 'waiting' || previousStatus === 'finished' || previousStatus === null) && currentStatus === 'playing') {
-                          setMessages((prevMessages) => [...prevMessages, { system: true, text: "Une nouvelle main commence." }]);
-                     }
-                     // Transitions into betting stages after dealing (dealing messages handled by server chat now)
-                     else if (previousStage === 'dealing_flop' && currentStage === 'flop_betting') {
-                         setMessages((prevMessages) => [...prevMessages, { system: true, text: "Le Flop est distribué." }]);
-                     } else if (previousStage === 'dealing_turn' && currentStage === 'turn_betting') {
-                         setMessages((prevMessages) => [...prevMessages, { system: true, text: "Le Turn est distribué." }]);
-                     } else if (previousStage === 'dealing_river' && currentStage === 'river_betting') {
-                         setMessages((prevMessages) => [...prevMessages, { system: true, text: "La River est distribuée." }]);
-                     }
-                     // Transition to showdown (before results are shown)
-                     else if (previousStage && previousStage.includes('_betting') && currentStage === 'showdown') {
-                          setMessages((prevMessages) => [...prevMessages, { system: true, text: "Le tour de mise est terminé. Showdown !" }]);
-                     }
-                     // Transition to showdown_complete (after results are calculated and distributed)
-                     else if ((previousStage === 'showdown' || (previousStage && previousStage.includes('_betting'))) && currentStage === 'showdown_complete') { // Also handle direct jump from betting to complete
-                          // Results are now available
-                         if (details.showdownResults) {
-                              const winnerNames = details.showdownResults.winners.map(w => w.username).join(', ');
-                              const winningHandText = details.showdownResults.winningHandName === "Wins by default"
-                               ? `(${details.showdownResults.winningHandDesc})` // For win by default, use desc
-                               : details.showdownResults.winningHandName ? `: ${details.showdownResults.winningHandName}` : ''; // For showdown, show hand name
-
-                             setMessages((prevMessages) => [...prevMessages, { system: true, text: `Main terminée. ${winnerNames} gagne${details.showdownResults.winners.length > 1 ? 'nt' : ''} ${winningHandText}. Pot total : ${details.showdownResults.potWon}.` }]);
-                         } else {
-                              // Fallback if no showdownResults despite showdown_complete
-                               setMessages((prevMessages) => [...prevMessages, { system: true, text: `Main terminée (Showdown Complete).` }]);
-                         }
-                     } else if (currentStatus === 'waiting' && previousStatus !== 'waiting') {
-                          // Transition back to waiting (e.g., after hand finished and players remain)
-                          setMessages((prevMessages) => [...prevMessages, { system: true, text: "Table en attente de la prochaine main." }]);
-                     }
-                }
 
                 // Store current states to become previous states for the next update
                 previousTableStateRef.current = { stage: currentStage, status: currentStatus };
@@ -341,7 +393,7 @@ function App() {
                 setActiveTableDetails(null);
                  previousTableStateRef.current = { stage: null, status: null }; // Reset state trackers
                 setError('Erreur lors de la réception des données de la table.');
-                setMessages((prevMessages) => [...prevMessages, { system: true, error: true, text: "Erreur lors du chargement des détails de la table." }]);
+                setMessages(prevMessages => [...prevMessages, { system: true, error: true, text: "Erreur lors du chargement des détails de la table.", timestamp: new Date().toISOString() }]);
              }
         });
 
@@ -519,7 +571,7 @@ function App() {
 
         // Start button visibility conditions checked by 'canIStartGame' in JSX.
         // Re-validate here before emitting for double security.
-         const eligiblePlayersForStart = activeTableDetails?.players?.filter(p => p.stack > 0.001 && (p.statusInHand === 'playing' || p.statusInHand === 'waiting' || p.statusInHand === 'sitting_out')) ?? [];
+         const eligiblePlayersForStart = activeTableDetails?.players?.filter(p => p.stack > 0.001 && (p.statusInHand === 'playing' || p.statusInHand === 'waiting' || p.statusInHand === 'sitting_out')) ?? []; // Use tolerance
          const isStartPossible = amIAtTable && activeTableDetails?.isCreator &&
                                 (activeTableDetails?.status === 'waiting' || activeTableDetails?.status === 'finished') &&
                                 eligiblePlayersForStart.length >= MIN_PLAYERS_TO_START;
@@ -564,26 +616,29 @@ function App() {
 
         console.log(`[CLIENT App.js] Emitting player_action: ${actionType}, Amount: ${floatAmount}`);
         socketRef.current.emit('player_action', { type: actionType, amount: floatAmount }); // Emit action to server
-        setBetAmountInput(''); // Clear the input after emitting action (optimistic)
+        // Don't clear input immediately for bet/raise, user might want to adjust quickly on error.
+        // setBetAmountInput(''); // Clear the input after emitting action (optimistic)
     };
 
     // Handlers for specific actions
     const handleFold = () => emitPlayerAction('fold');
-    const handleCheck = () => emitPlayerAction('check');
-    const handleCall = () => emitPlayerAction('call'); // Amount 0 is fine for call, server uses currentBet - betInStage
+    const handleCheck = () => emitPlayerAction('check'); // Amount 0 is fine for check
+    const handleCall = () => emitPlayerAction('call', amountToCall); // Send the amount needed to call (or stack if less)
 
     const handleBet = () => {
         const amount = parseFloat(betAmountInput);
         // Client-side validation (basic) - server does strict validation
         if (isNaN(amount) || amount <= 0) { setError("Montant de la mise invalide."); return; }
-        if (myPlayerData && amount > myPlayerData.stack + 0.001) { setError("Mise supérieure à votre stack."); return; } // Add tolerance
-         // Check min bet unless it's an all-in
-        if (activeTableDetails && amount < activeTableDetails.bigBlind - 0.001 && Math.abs(amount - myPlayerData?.stack) > 0.001) { // Add tolerance for all-in check
+        // Use tolerance for comparisons with stack/blinds
+        if (myPlayerData && amount > myPlayerData.stack + 0.001) { setError("Mise supérieure à votre stack."); return; }
+         // Check min bet unless it's an all-in (Amount === player stack)
+        if (activeTableDetails && amount < activeTableDetails.bigBlind - 0.001 && Math.abs(amount - (myPlayerData?.stack ?? 0)) > 0.001) {
              setError(`Mise min ${activeTableDetails.bigBlind} (ou All-in pour moins).`);
              return;
         }
-
         emitPlayerAction('bet', amount);
+         setBetAmountInput(''); // Clear input on successful action emit
+
     };
 
     const handleRaise = () => {
@@ -593,21 +648,23 @@ function App() {
 
          const currentBet = activeTableDetails?.currentBet ?? 0;
          // Cannot raise if amount <= currentBet (total amount must be higher)
-          if (amount <= currentBet + 0.001 && Math.abs(amount - myPlayerData?.stack) > 0.001) { // Allow all-in = currentBet if stack < amount needed, add tolerance
+          // Allow all-in = currentBet if stack < amount needed - This case should be handled by the All-in button.
+          // The Raise button is for raises *greater* than currentBet.
+          if (amount <= currentBet + 0.001) { // Use tolerance
               setError(`Le montant total de votre relance (${amount}) doit être strictement supérieur à la mise actuelle (${currentBet}).`);
               return;
           }
 
          // Calculate min raise total for client-side hint/validation
-         // Min raise size is the size of the LAST raise (or BB if no prior raise)
-         const lastRaiseSize = activeTableDetails?.lastRaiseSize ?? 0;
-         const bigBlind = activeTableDetails?.bigBlind ?? 1;
-         const minAmountToAdd = lastRaiseSize > 0.001 ? lastRaiseSize : bigBlind; // Size to add is last raise size or BB, use tolerance
-         const minTotalRaiseRequired = parseFloat((currentBet + minAmountToAdd).toFixed(2)); // Calculate min total needed
+         // Min raise size is the size of the LAST raise (or BB if it's the first raise pre-flop after blinds). Use tolerance.
+         const lastRaiseSize = activeTableDetails?.lastRaiseSize > 0.001 ? activeTableDetails.lastRaiseSize : (activeTableDetails?.bigBlind ?? 1);
+         const minTotalRaiseRequired = parseFloat((currentBet + lastRaiseSize).toFixed(2)); // Calculate min total needed
 
 
          // Allow raise if amount is >= minTotalRaiseRequired OR it's an all-in
-         if (amount < minTotalRaiseRequired - 0.001 && Math.abs(amount - myPlayerData?.stack) > 0.001) { // Add tolerance for comparison and all-in check
+         // Note: An all-in that is less than the standard min raise is allowed by the server (if > call amount),
+         // but won't enable the standard "Raise" button here unless it's an all-in *equal to or greater than* the min raise size.
+         if (amount < minTotalRaiseRequired - 0.001 && Math.abs(amount - (myPlayerData?.stack ?? 0)) > 0.001) { // Use tolerance for comparison and all-in check
               setError(`Relance min totale ${minTotalRaiseRequired} (ou All-in pour moins).`);
               return;
          }
@@ -616,6 +673,7 @@ function App() {
 
 
         emitPlayerAction('raise', amount);
+         setBetAmountInput(''); // Clear input on successful action emit
     };
 
     // Helper to handle All-in action
@@ -640,10 +698,12 @@ function App() {
 
         // Server will determine if All-in is a bet or raise based on currentBet
         const currentBet = activeTableDetails?.currentBet ?? 0;
+        // If currentBet is 0, it's a bet. If currentBet > 0, it's a raise (even if stack < min raise).
         const actionType = currentBet < 0.001 ? 'bet' : 'raise'; // Use tolerance
         console.log(`[CLIENT App.js] Attempting All-in action: Type=${actionType}, Amount=${myStack}`);
         // Send the action type ('bet' or 'raise') and the full stack amount. Server will validate.
         emitPlayerAction(actionType, myStack);
+         setBetAmountInput(''); // Clear input on successful action emit
     };
 
 
@@ -659,11 +719,12 @@ function App() {
 
 
     // Can I make a standard action (Check, Call, Bet, Raise)? Requires turn, 'playing' status, and stack > 0.
-    const isMyTurnAndCanAct = isMyTurn && myPlayerData?.statusInHand === 'playing' && (myPlayerData?.stack ?? 0) > 0.001; // Use tolerance for stack 0
+     // Use tolerance for stack 0
+    const isMyTurnAndCanAct = isMyTurn && myPlayerData?.statusInHand === 'playing' && (myPlayerData?.stack ?? 0) > 0.001;
 
 
     // Start game button visibility conditions
-    const eligiblePlayersForStart = activeTableDetails?.players?.filter(p => p.stack > 0.001 && (p.statusInHand === 'playing' || p.statusInHand === 'waiting' || p.statusInHand === 'sitting_out')) ?? [];
+     const eligiblePlayersForStart = activeTableDetails?.players?.filter(p => p.stack > 0.001 && (p.statusInHand === 'playing' || p.statusInHand === 'waiting' || p.statusInHand === 'sitting_out')) ?? []; // Use tolerance
     const canIStartGame = amIAtTable && activeTableDetails?.isCreator &&
                           (activeTableDetails?.status === 'waiting' || activeTableDetails?.status === 'finished') &&
                           eligiblePlayersForStart.length >= MIN_PLAYERS_TO_START;
@@ -679,7 +740,7 @@ function App() {
 
     // Can Check: Is my turn AND (my betInStage matches currentBet OR currentBet is 0).
     // Player can be 'playing' or 'all_in' to check if bets match.
-    const canCheck = isMyTurn && (myPlayerData?.statusInHand === 'playing' || myPlayerData?.statusInHand === 'all_in') && Math.abs(playerBetInStage - currentBet) < 0.001;
+     const canCheck = isMyTurn && (myPlayerData?.statusInHand === 'playing' || myPlayerData?.statusInHand === 'all_in') && Math.abs(playerBetInStage - currentBet) < 0.001;
 
 
     // Can Call: Is my turn AND my betInStage is less than currentBet AND I have stack > 0 (to put chips in).
@@ -693,7 +754,8 @@ function App() {
 
     // Can Raise: Is my turn and I can make a standard action (playing + stack > 0), there is a current bet > 0,
     // and player has enough stack for a standard raise total.
-    const minAmountToAddForRaise = lastRaiseSize > 0.001 ? lastRaiseSize : bigBlind; // Size to add is last raise size or BB, use tolerance
+     // Use tolerance for lastRaiseSize and bigBlind
+    const minAmountToAddForRaise = lastRaiseSize > 0.001 ? lastRaiseSize : (bigBlind > 0.001 ? bigBlind : 1); // Min raise size is last raise or BB (default 1 if BB is 0)
     const minTotalRaiseRequired = parseFloat((currentBet + minAmountToAddForRaise).toFixed(2)); // Calculate min total needed
 
 
@@ -701,11 +763,12 @@ function App() {
     // AND I have enough stack for a standard raise total.
     // Note: An all-in that is less than the standard min raise is allowed by the server (if > call amount),
     // but won't enable the standard "Raise" button here. The All-in button handles that case.
-    const canRaise = isMyTurnAndCanAct && currentBet > 0.001 && playerStack >= minTotalRaiseRequired - 0.001; // Add tolerance for stack check
+     // Use tolerance for stack check
+    const canRaise = isMyTurnAndCanAct && currentBet > 0.001 && playerStack >= minTotalRaiseRequired - 0.001;
 
 
     // Minimum value for the bet/raise input for client-side hint and validation
-    const minBetRaiseInputValue = currentBet < 0.001 ? bigBlind : minTotalRaiseRequired;
+     const minBetRaiseInputValue = currentBet < 0.001 ? (bigBlind > 0.001 ? bigBlind : 1) : minTotalRaiseRequired; // Use default 1 if BB is somehow 0
     // Ensure min input is not less than 0 and not more than player's stack
     const safeMinBetRaiseInputValue = Math.max(0, parseFloat(Math.min(minBetRaiseInputValue, playerStack).toFixed(2)) ); // Cap min at player stack
 
@@ -713,20 +776,28 @@ function App() {
     // Can All-in: Is it my turn AND I have chips > 0.
     // This button is enabled whenever it's their turn AND they have chips > 0.
     // Server will determine if the all-in constitutes a Bet, Call, or Raise.
-    const canAllIn = isMyTurn && playerStack > 0.001; // Use tolerance for stack 0
+     const canAllIn = isMyTurn && playerStack > 0.001; // Use tolerance for stack 0
 
 
      // Is the game in a stage where showdown results are displayed?
-     const isShowdownVisible = activeTableDetails?.stage === 'showdown_complete' || activeTableDetails?.status === 'finished';
+     // This is now primarily driven by the presence of showdownResults data, used by the chat logic.
+     // We no longer have a dedicated UI section for this.
+     // const isShowdownVisible = activeTableDetails?.stage === 'showdown_complete' || activeTableDetails?.status === 'finished';
 
 
      // Prepare players data for mapping in the player list (create placeholders for empty seats)
-     const playersInSeats = new Array(activeTableDetails?.maxPlayers).fill(null);
+     const playersInSeats = new Array(activeTableDetails?.maxPlayers || 9).fill(null); // Default to 9 seats if maxPlayers is null
       activeTableDetails?.players.forEach(p => {
-          if (p?.seat && p.seat <= activeTableDetails.maxPlayers) {
+          if (p?.seat && p.seat >= 1 && p.seat <= (activeTableDetails?.maxPlayers || 9)) {
               playersInSeats[p.seat - 1] = p;
           }
       });
+     // Populate empty seats with placeholder objects
+     for(let i = 0; i < playersInSeats.length; i++) {
+          if(playersInSeats[i] === null) {
+               playersInSeats[i] = { seat: i + 1, username: null, stack: 0, statusInHand: 'empty', holeCards: null, betInStage: 0, hasCards: false, showdownInfo: null };
+          }
+     }
 
 
     // --- Render UI ---
@@ -767,7 +838,8 @@ function App() {
                                 <ul className="table-list">
                                     {Array.isArray(tables) && tables.map((t) => {
                                         // Disable join button if table is full OR user is already at a table OR game is in progress/dealing/showdown stages
-                                        const isJoinDisabled = t.playerCount >= t.maxPlayers || !!currentTableId || t.status === 'playing' || t.stage === 'dealing' || t.stage === 'preflop_blinds' || t.stage === 'showdown' || t.stage === 'showdown_complete';
+                                         // A player can only join if table status is 'waiting' or 'finished'
+                                        const isJoinDisabled = t.playerCount >= t.maxPlayers || !!currentTableId || (t.status !== 'waiting' && t.status !== 'finished');
                                          // Add a class for tables where game is in progress
                                         const listItemClassName = t.status === 'playing' ? 'table-in-progress' : '';
 
@@ -815,19 +887,15 @@ function App() {
 
                                         {/* Player Seats - Use the playersInSeats array to render fixed positions */}
                                         <ul className="player-seats">
-                                            {playersInSeats.map((player, index) => {
-                                                 // Create a dummy player object for empty seats to simplify rendering PlayerSeat
-                                                 const seatNumber = index + 1;
-                                                 const playerOrEmpty = player || { seat: seatNumber, username: null, stack: 0, statusInHand: 'empty', holeCards: null, betInStage: 0, hasCards: false };
-                                                 const isCurrentUser = playerOrEmpty.username === username;
-
+                                            {playersInSeats.map((player) => {
+                                                 const isCurrentUser = player.username === username;
+                                                 // Pass full player object, PlayerSeat handles null/empty
                                                  return (
                                                       <PlayerSeat
-                                                          key={seatNumber}
-                                                          player={playerOrEmpty}
+                                                          key={player.seat} // Use seat as key as it's unique per li
+                                                          player={player}
                                                           isCurrentUser={isCurrentUser}
                                                           tableDetails={activeTableDetails} // Pass table details needed by PlayerSeat
-                                                          totalPlayers={activeTableDetails.players.length}
                                                       />
                                                  );
                                             })}
@@ -835,67 +903,11 @@ function App() {
 
                                     </div> {/* End game-table-area */}
 
-
-                                    {/* Section for Showdown Results - Displayed after hand ends and results are ready */}
-                                    {(isShowdownVisible && activeTableDetails.showdownResults?.orderedShowdown) && (
-                                        <div className="showdown-results">
-                                            <h3>Résultats du Showdown</h3>
-
-                                            {/* Summary of winners and winning hand if available */}
-                                            {Array.isArray(activeTableDetails.showdownResults.winners) && activeTableDetails.showdownResults.winners.length > 0 && (
-                                                <p>Gagnant(s) : {activeTableDetails.showdownResults.winners.map(w => w.username).join(', ')} (Pot total gagné : {activeTableDetails.showdownResults.potWon})</p>
-                                            )}
-                                             {activeTableDetails.showdownResults.winningHandName && activeTableDetails.showdownResults.winningHandName !== "Wins by default" && (
-                                                 <p>Main gagnante : <strong>{activeTableDetails.showdownResults.winningHandName}</strong> ({activeTableDetails.showdownResults.winningHandDesc})</p>
-                                             )}
-                                              {activeTableDetails.showdownResults.winningHandName === "Wins by default" && (
-                                                   <p>Gagne par défaut : ({activeTableDetails.showdownResults.winningHandDesc})</p>
-                                              )}
-                                             {Array.isArray(activeTableDetails.showdownResults.winners) && activeTableDetails.showdownResults.winners.length === 0 && (
-                                                  <p>Aucun gagnant déclaré. Pot non distribué.</p>
-                                             )}
-
-                                            {/* Detailed Showdown Reveal Order */}
-                                            {Array.isArray(activeTableDetails.showdownResults.orderedShowdown) && activeTableDetails.showdownResults.orderedShowdown.length > 0 && (
-                                                <div className="showdown-reveal-order">
-                                                    <h4>Révélation des mains :</h4>
-                                                    <ol>
-                                                        {activeTableDetails.showdownResults.orderedShowdown.map(sdPlayer => (
-                                                            <li key={`sd-${sdPlayer.seat}`}>
-                                                                <strong>{sdPlayer.username} (S{sdPlayer.seat}):</strong>
-                                                                {sdPlayer.show ? (
-                                                                     <>
-                                                                         <span> Montre </span>
-                                                                         {/* Display hole cards for the shown hand */}
-                                                                         <div className="player-hole-cards small-cards">
-                                                                             {sdPlayer.holeCards?.map((card, idx) => <Card key={idx} card={card} />)}
-                                                                         </div>
-                                                                         {/* Display hand name and if they won */}
-                                                                         {sdPlayer.hand ? (
-                                                                             <span className={sdPlayer.isWinner ? 'winner-text' : 'hand-text'}>
-                                                                                ({sdPlayer.hand.name}{sdPlayer.hand.desc && sdPlayer.hand.name !== sdPlayer.hand.desc ? ` - ${sdPlayer.hand.desc}` : ''}) {sdPlayer.isWinner ? '🏆' : ''}
-                                                                             </span>
-                                                                         ) : (
-                                                                              <span className="hand-text">(Main montrée, non résolue)</span> // Fallback if hand object is missing but shown
-                                                                         )}
-                                                                     </>
-                                                                ) : (
-                                                                     <span className="mucked-text">Couche sa main ({sdPlayer.muckReason || 'raison inconnue'}).</span>
-                                                                )}
-                                                            </li>
-                                                        ))}
-                                                    </ol>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-
-
                                      {/* Section for "Start Game" button */}
                                      {/* Display if is creator, table is waiting OR finished, and enough eligible players */}
                                      {canIStartGame && (
                                          <div className="start-game-section">
-                                             <button onClick={handleStartGame} className="start-game-button">
+                                             <button onClick={handleStartGame} className="start-game-button" disabled={!canIStartGame}>
                                                  {activeTableDetails.status === 'finished' ? 'Démarrer Nouvelle Main' : 'Démarrer Partie'} ({eligiblePlayersForStart.length} J éligibles)
                                              </button>
                                          </div>
@@ -927,13 +939,13 @@ function App() {
                                             )}
 
                                             {/* Callable if betInStage < currentBet AND stack > 0 */}
-                                             { canCall && playerStack > 0.001 && (
+                                             { canCall && playerStack > 0.001 && ( // Redundant playerStack > 0.001 check, canCall includes it
                                                    <button onClick={handleCall} disabled={!isMyTurn}>Call {amountToCall > 0 ? amountToCall : ''}</button>
                                              )}
 
 
                                             {/* Section for Bet and Raise with input - Visible if I am 'playing' and Stack > 0 */}
-                                            { isMyTurnAndCanAct && (
+                                             { isMyTurnAndCanAct && ( // isMyTurnAndCanAct already checks 'playing' + stack > 0
                                                 <div className="bet-raise-section">
                                                      {/* Input is for the TOTAL bet/raise amount */}
                                                      <input
@@ -942,60 +954,73 @@ function App() {
                                                          onChange={(e) => setBetAmountInput(e.target.value)}
                                                           // Placeholder changes depending on whether it's a bet or raise
                                                          placeholder={currentBet < 0.001 ? `Min ${safeMinBetRaiseInputValue}` : `Min Total ${safeMinBetRaiseInputValue}`}
-                                                         min={currentBet < 0.001 ? (activeTableDetails?.bigBlind ?? 1) : minTotalRaiseRequired} // Logical minimum based on rules
+                                                         min={currentBet < 0.001 ? (activeTableDetails?.bigBlind > 0.001 ? activeTableDetails.bigBlind : 1) : minTotalRaiseRequired} // Logical minimum based on rules (use 1 as default if BB is 0 or less)
                                                          step="any" // Allow decimals for small blinds/stacks
                                                          disabled={!isMyTurnAndCanAct} // Disabled if cannot perform standard action (playing + stack > 0)
                                                          className="bet-input"
+                                                         // Set initial value if the player has a bet already in this stage (helps with raising UI)
+                                                         // defaultValue={playerBetInStage > 0 ? playerBetInStage : ''} // Removed defaultValue to allow blank input
                                                      />
                                                      {/* Bet/Raise Buttons: enabled if possible and input has a valid positive value */}
                                                      {/* Bet button appears only if currentBet is effectively 0 and I can act */}
-                                                     { canBet && (
-                                                          <button onClick={handleBet} disabled={!isMyTurnAndCanAct || !betAmountInput || parseFloat(betAmountInput) < (activeTableDetails?.bigBlind ?? 1)}>Bet</button>
+                                                     { canBet && ( // canBet already checks currentBet < 0.001 and isMyTurnAndCanAct
+                                                          <button onClick={handleBet} disabled={!isMyTurnAndCanAct || !betAmountInput || parseFloat(betAmountInput) < (activeTableDetails?.bigBlind > 0.001 ? activeTableDetails.bigBlind : 1)}>Bet</button> // Use BB as min bet client-side
                                                      )}
                                                      {/* Raise button appears only if currentBet > 0 and I can act */}
-                                                     { canRaise && ( // canRaise already checks currentBet > 0 and stack >= minTotalRaiseRequired
-                                                          <button onClick={handleRaise} disabled={!isMyTurnAndCanAct || !betAmountInput || parseFloat(betAmountInput) < minTotalRaiseRequired}>Raise</button>
+                                                     { canRaise && ( // canRaise already checks currentBet > 0.001 and isMyTurnAndCanAct and stack >= minTotalRaiseRequired
+                                                          <button onClick={handleRaise} disabled={!isMyTurnAndCanAct || !betAmountInput || parseFloat(betAmountInput) < minTotalRaiseRequired}>Raise</button> // Use minTotalRaiseRequired client-side
                                                      )}
 
-                                                     {/* All-in Button - Appears if I have chips and it's my turn */}
-                                                      { canAllIn && (
-                                                          <button onClick={handleAllIn} className="allin-button" disabled={!isMyTurn || playerStack <= 0.001}>All-in ({playerStack})</button>
-                                                       )}
                                                 </div>
                                             )}
 
+                                            {/* All-in Button - Appears if I have chips and it's my turn */}
+                                             { canAllIn && ( // canAllIn already checks isMyTurn + stack > 0
+                                                 // Disable if already all-in (defensive)
+                                                 <button onClick={handleAllIn} className="allin-button" disabled={!canAllIn || myPlayerData?.statusInHand === 'all_in'}>All-in ({playerStack})</button>
+                                              )}
+
 
                                              {/* Message and actions if it's my turn but I'm all-in (statusInHand === 'all_in') with stack 0 */}
-                                             {/* This block is for players who *are* already all-in and it's their turn, and stack is 0 */}
+                                             {/* This block is for players who *are* already all-in and it's their turn, and stack is effectively 0 */}
                                              {isMyTurn && myPlayerData?.statusInHand === 'all_in' && playerStack <= 0.001 && (
                                                   <>
                                                        {/* Stack is 0, can only Fold or wait */}
-                                                       { (myPlayerData?.betInStage ?? 0) < (activeTableDetails?.currentBet ?? 0) ? (
+                                                       { /* If betInStage < currentBet and stack 0, they can only Fold */ }
+                                                        { (myPlayerData?.betInStage ?? 0) < (activeTableDetails?.currentBet ?? 0) - 0.001 ? ( // Use tolerance
                                                             <p>Vous êtes All-in pour moins que la mise actuelle. Vous pouvez Fold.</p>
-                                                       ) : ( // BetInStage >= currentBet (matched or exceeded, but stack 0 so matched)
-                                                            <p>Vous êtes All-in et avez égalé la mise. Attendez la fin de la main.</p>
+                                                       ) : ( // BetInStage >= currentBet (matched or exceeded, but stack 0 so matched/exceeded up to 0)
+                                                            <p>Vous êtes All-in et avez égalé ou dépassé la mise actuelle (avec votre stack restant). Attendez la fin de la main.</p>
                                                        )}
                                                         {/* Allow fold action for all-in player if facing bet */}
-                                                          {(myPlayerData?.betInStage ?? 0) < (activeTableDetails?.currentBet ?? 0) && (
+                                                          {(myPlayerData?.betInStage ?? 0) < (activeTableDetails?.currentBet ?? 0) - 0.001 && ( // Use tolerance
                                                               <button onClick={handleFold} disabled={!isMyTurn}>Fold</button>
                                                           )}
                                                   </>
                                              )}
 
-                                              {/* Message if it's my turn but stack is 0 or status is sitting_out */}
-                                              {/* This case is for players who are NOT 'all_in' but have stack 0 or are sitting_out */}
-                                             {isMyTurn && (playerStack <= 0.001 || myPlayerData?.statusInHand === 'sitting_out') && myPlayerData?.statusInHand !== 'all_in' && (
+                                              {/* Message if it's my turn but stack is 0 or status is sitting_out/waiting */}
+                                              {/* This case is for players who are NOT 'all_in' but have stack 0 or are sitting_out/waiting */}
+                                             {isMyTurn && (playerStack <= 0.001 || myPlayerData?.statusInHand === 'sitting_out' || myPlayerData?.statusInHand === 'waiting') && myPlayerData?.statusInHand !== 'all_in' && (
                                                   <div className="game-actions">
-                                                        <h4>Votre Action (Stack: {playerStack} - {myPlayerData?.statusInHand === 'sitting_out' ? 'Sit Out' : 'Stack 0'})</h4>
+                                                        <h4>Votre Action (Stack: {playerStack} - {myPlayerData?.statusInHand === 'sitting_out' ? 'Sit Out' : (myPlayerData?.statusInHand === 'waiting' ? 'En attente' : 'Stack 0')})</h4>
                                                         <p>Vous ne pouvez pas effectuer d'action avec votre stack actuel ou votre statut ({myPlayerData?.statusInHand}).</p>
                                                         {/* No action buttons available */}
                                                   </div>
                                              )}
 
                                               {/* Message if it's someone else's turn */}
-                                             {!isMyTurn && activeTableDetails?.status === 'playing' && !(activeTableDetails.stage?.includes('dealing')) && activeTableDetails.stage !== 'showdown' && activeTableDetails.stage !== 'showdown_complete' && (
+                                             {!isMyTurn && activeTableDetails?.status === 'playing' && !(activeTableDetails.stage?.includes('dealing')) && activeTableDetails.stage !== 'showdown' && activeTableDetails.stage !== 'showdown_complete' && activeTableDetails.currentTurnSeat !== null && activeTableDetails.players.length > 0 && (
                                                 <p>En attente de l'action de {activeTableDetails.players.find(p => p.seat === activeTableDetails.currentTurnSeat)?.username || `joueur au siège ${activeTableDetails.currentTurnSeat}`}...</p>
                                              )}
+                                              {/* Message if game is playing but nobody has the turn (intermediate stage or error) */}
+                                              {activeTableDetails?.status === 'playing' && (activeTableDetails.stage?.includes('dealing') || activeTableDetails.stage === 'showdown' || activeTableDetails.stage === 'showdown_complete') && (
+                                                  <p>Phase de jeu en cours ({activeTableDetails.stage}). Attendez la prochaine action ou main.</p>
+                                              )}
+                                              {/* Message if game is not playing */}
+                                               {activeTableDetails?.status !== 'playing' && (
+                                                    <p>Attente de {activeTableDetails.players.length < (activeTableDetails?.maxPlayers || 9) ? 'joueurs...' : 'démarrage de la main...'}</p>
+                                               )}
 
 
                                         </div>
@@ -1006,7 +1031,7 @@ function App() {
                                     <button onClick={handleLeaveTable} className="leave-button">Quitter la Table</button>
                                  </>
                             ) : (
-                                <p>Chargement des détails de la table...</p> // Message during loading
+                                <p>Chargement des détails de la table...</p> // Message during loading (shouldn't happen if currentTableId is not null)
                             )}
                         </div>
                     )}
@@ -1016,11 +1041,12 @@ function App() {
                         <h2>Chat</h2>
                         <div className="messages">
                             {messages.map((m, i) => (
+                                // Add a unique key prop for list rendering efficiency
                                 <p key={i} className={m.system ? (m.error ? 'system-error-message' : 'system-message') : 'user-message'}>
                                     {m.system ? (m.error ? '❗' : 'ℹ️') + ' ' + m.text : <><strong>{m.user}:</strong> {m.text}</>}
                                 </p>
                             ))}
-                            <div ref={messagesEndRef} />
+                            <div ref={messagesEndRef} /> {/* Element to scroll to */}
                         </div>
                         {/* Message sending form */}
                         <form onSubmit={sendMessage} className="message-form">
@@ -1037,7 +1063,7 @@ function App() {
                 </div>
             )}
 
-            {/* Message if not connected and username not set */}
+            {/* Message if not connected and username not set (Initial state) */}
             {!isConnected && !isUsernameSet && <p>En attente de connexion au serveur...</p>}
         </div>
     );
