@@ -4,11 +4,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import './App.css'; // Import the CSS file for styling
 
+// Define suit symbols outside of component scope if needed in multiple places
+const suitSymbols = { s: '♠', h: '♥', d: '♦', c: '♣' };
+
 // --- Card Component ---
 // Component to display a single card
 function Card({ card }) {
     if (!card) return <div className="card empty"></div>;
-    const suitSymbols = { s: '♠', h: '♥', d: '♦', c: '♣' };
+    // Ensure suitSymbols is accessible or defined here
+    // const suitSymbols = { s: '♠', h: '♥', d: '♦', c: '♣' }; // Already defined globally above
     const rank = card.substring(0, card.length - 1);
     const suit = card.substring(card.length - 1);
     // Use Pokersolver ranks 'T', 'J', 'Q', 'K', 'A' directly if present
@@ -305,16 +309,33 @@ function App() {
                           if (previousStage === 'dealing' && currentStage === 'preflop_blinds') { // Transition after dealing hole cards (before blinds)
                                 // No community cards yet
                           } else if ((previousStage === 'preflop_betting' || previousStage === 'preflop_blinds') && currentStage === 'flop_betting') {
-                              if (details.communityCards && details.communityCards.length >= 3) {
-                                    newMessages = [...newMessages, { system: true, text: `Le Flop est distribué : [ ${details.communityCards.slice(0, 3).join(', ')} ]`, timestamp }];
+                              if (details.communityCards && details.communityCards.length >= 3 && previousStage !== 'flop_betting') { // Only add if transitioning TO flop betting
+                                    const flopCards = details.communityCards.slice(0, 3);
+                                     const formattedFlop = flopCards.map(card => {
+                                         const rank = card.substring(0, card.length - 1);
+                                         const suit = card.substring(card.length - 1);
+                                         const displayRank = rank === 'T' ? '10' : rank;
+                                         return `${displayRank}${suitSymbols[suit]}`; // Use global suitSymbols
+                                     }).join(', ');
+                                    newMessages = [...newMessages, { system: true, text: `Le Flop est distribué : [ ${formattedFlop} ]`, timestamp }];
                               }
                           } else if (previousStage === 'flop_betting' && currentStage === 'turn_betting') {
-                               if (details.communityCards && details.communityCards.length >= 4) {
-                                    newMessages = [...newMessages, { system: true, text: `Le Turn est distribué : [ ${details.communityCards.slice(3, 4).join(', ')} ]`, timestamp }];
+                               if (details.communityCards && details.communityCards.length >= 4 && previousStage !== 'turn_betting') { // Only add if transitioning TO turn betting
+                                   const turnCard = details.communityCards.slice(3, 4)[0];
+                                    const rank = turnCard.substring(0, turnCard.length - 1);
+                                    const suit = turnCard.substring(turnCard.length - 1);
+                                    const displayRank = rank === 'T' ? '10' : rank;
+                                    const formattedTurn = `${displayRank}${suitSymbols[suit]}`; // Use global suitSymbols
+                                    newMessages = [...newMessages, { system: true, text: `Le Turn est distribué : [ ${formattedTurn} ]`, timestamp }];
                                }
                           } else if (previousStage === 'turn_betting' && currentStage === 'river_betting') {
-                               if (details.communityCards && details.communityCards.length >= 5) {
-                                    newMessages = [...newMessages, { system: true, text: `La River est distribuée : [ ${details.communityCards.slice(4, 5).join(', ')} ]`, timestamp }];
+                               if (details.communityCards && details.communityCards.length >= 5 && previousStage !== 'river_betting') { // Only add if transitioning TO river betting
+                                   const riverCard = details.communityCards.slice(4, 5)[0];
+                                    const rank = riverCard.substring(0, riverCard.length - 1);
+                                    const suit = riverCard.substring(riverCard.length - 1);
+                                    const displayRank = rank === 'T' ? '10' : rank;
+                                    const formattedRiver = `${displayRank}${suitSymbols[suit]}`; // Use global suitSymbols
+                                    newMessages = [...newMessages, { system: true, text: `La River est distribuée : [ ${formattedRiver} ]`, timestamp }];
                                }
                           }
                           // Transition to showdown (before results are shown)
@@ -327,14 +348,14 @@ function App() {
                               if (details.showdownResults) {
                                    const winnerNames = Array.isArray(details.showdownResults.winners) ? details.showdownResults.winners.map(w => w.username).join(', ') : 'Aucun';
                                    const winningHandName = details.showdownResults.winningHandName || 'N/A';
-                                   const winningHandDesc = details.showdownResults.winningHandDesc || 'No description';
+                                   const winningHandDesc = details.showdownResults.winningHandDesc || ''; // Allow empty desc
                                    const potWon = details.showdownResults.potWon ?? 0;
 
                                   // Summary message
                                   if (Array.isArray(details.showdownResults.winners) && details.showdownResults.winners.length > 0) {
                                        const summaryText = winningHandName === "Wins by default"
                                         ? `Main terminée. ${winnerNames} gagne par défaut (${winningHandDesc}). Pot total : ${potWon}.`
-                                        : `Main terminée. ${winnerNames} gagne${details.showdownResults.winners.length > 1 ? 'nt' : ''} avec un ${winningHandName} (${winningHandDesc}). Pot total : ${potWon}.`;
+                                        : `Main terminée. ${winnerNames} gagne${details.showdownResults.winners.length > 1 ? 'nt' : ''} avec un ${winningHandName}${winningHandDesc && winningHandName !== winningHandDesc ? ` (${winningHandDesc})` : ''}. Pot total : ${potWon}.`; // Add desc only if different from name
                                         newMessages = [...newMessages, { system: true, text: summaryText, timestamp }];
                                   } else {
                                       newMessages = [...newMessages, { system: true, text: `Main terminée. Aucun gagnant déclaré. Pot total : ${potWon}.`, timestamp }];
@@ -348,7 +369,17 @@ function App() {
                                       details.showdownResults.orderedShowdown.forEach(sdPlayer => {
                                           let revealText = `${sdPlayer.username} (S${sdPlayer.seat})`;
                                           if (sdPlayer.show) {
-                                               const cardString = Array.isArray(sdPlayer.holeCards) ? `[${sdPlayer.holeCards.join(', ')}]` : '[]';
+                                               // Format hole cards with symbols
+                                               const formattedHoleCards = Array.isArray(sdPlayer.holeCards)
+                                                   ? sdPlayer.holeCards.map(card => {
+                                                       const rank = card.substring(0, card.length - 1);
+                                                       const suit = card.substring(card.length - 1);
+                                                        const displayRank = rank === 'T' ? '10' : rank;
+                                                       return `${displayRank}${suitSymbols[suit]}`; // Use global suitSymbols
+                                                   }).join(', ')
+                                                   : '';
+                                               const cardString = `[${formattedHoleCards}]`;
+
                                                const handName = sdPlayer.hand?.name || 'Main inconnue';
                                                const handDesc = sdPlayer.hand?.desc && handName !== sdPlayer.hand?.desc ? ` - ${sdPlayer.hand.desc}` : ''; // Add desc if different from name
                                                revealText += ` montre ${cardString} (${handName}${handDesc}).`;
@@ -358,6 +389,7 @@ function App() {
                                           }
                                           newMessages = [...newMessages, { system: true, text: revealText, timestamp }];
                                       });
+                                      newMessages = [...newMessages, { system: true, text: "--------------------------", timestamp }]; // Footer
                                   }
                               } else {
                                    // Fallback if no showdownResults despite showdown_complete
@@ -368,9 +400,6 @@ function App() {
                                newMessages = [...newMessages, { system: true, text: "Table en attente de la prochaine main.", timestamp }];
                           }
                      }
-
-                     // Ensure we don't add duplicate messages by checking timestamp and text? Or just trust the logic above adds them once per transition.
-                     // For simplicity, just add the new messages generated by the transition logic.
 
                     return newMessages; // Return the updated message array
                  });
@@ -762,7 +791,7 @@ function App() {
     // Can raise if it's my turn AND I can make a standard action (playing + stack > 0), AND I'm facing a bet (currentBet > 0),
     // AND I have enough stack for a standard raise total.
     // Note: An all-in that is less than the standard min raise is allowed by the server (if > call amount),
-    // but won't enable the standard "Raise" button here. The All-in button handles that case.
+    // but won't enable the standard "Raise" button here unless it's an all-in *equal to or greater than* the min raise size.
      // Use tolerance for stack check
     const canRaise = isMyTurnAndCanAct && currentBet > 0.001 && playerStack >= minTotalRaiseRequired - 0.001;
 
@@ -777,12 +806,6 @@ function App() {
     // This button is enabled whenever it's their turn AND they have chips > 0.
     // Server will determine if the all-in constitutes a Bet, Call, or Raise.
      const canAllIn = isMyTurn && playerStack > 0.001; // Use tolerance for stack 0
-
-
-     // Is the game in a stage where showdown results are displayed?
-     // This is now primarily driven by the presence of showdownResults data, used by the chat logic.
-     // We no longer have a dedicated UI section for this.
-     // const isShowdownVisible = activeTableDetails?.stage === 'showdown_complete' || activeTableDetails?.status === 'finished';
 
 
      // Prepare players data for mapping in the player list (create placeholders for empty seats)
@@ -1026,9 +1049,10 @@ function App() {
                                         </div>
                                     )}
 
+                                     {/* "Leave Table" button - Now positioned outside game-table-container */}
+                                     {/* Moved below for structural clarity, positioned via CSS */}
+                                     {/* <button onClick={handleLeaveTable} className="leave-button">Quitter la Table</button> */}
 
-                                    {/* "Leave Table" button */}
-                                    <button onClick={handleLeaveTable} className="leave-button">Quitter la Table</button>
                                  </>
                             ) : (
                                 <p>Chargement des détails de la table...</p> // Message during loading (shouldn't happen if currentTableId is not null)
@@ -1036,29 +1060,38 @@ function App() {
                         </div>
                     )}
 
-                    {/* --- CHAT --- */}
-                    <div className="chat-box">
-                        <h2>Chat</h2>
-                        <div className="messages">
-                            {messages.map((m, i) => (
-                                // Add a unique key prop for list rendering efficiency
-                                <p key={i} className={m.system ? (m.error ? 'system-error-message' : 'system-message') : 'user-message'}>
-                                    {m.system ? (m.error ? '❗' : 'ℹ️') + ' ' + m.text : <><strong>{m.user}:</strong> {m.text}</>}
-                                </p>
-                            ))}
-                            <div ref={messagesEndRef} /> {/* Element to scroll to */}
+                    {/* --- CHAT AND LEAVE BUTTON CONTAINER --- */}
+                    {/* Wrap Chat and Leave button in a container for positioning */}
+                    <div className="chat-and-leave-container">
+                        {/* --- CHAT --- */}
+                        <div className="chat-box">
+                            <h2>Chat</h2>
+                            <div className="messages">
+                                {messages.map((m, i) => (
+                                    // Add a unique key prop for list rendering efficiency
+                                    <p key={i} className={m.system ? (m.error ? 'system-error-message' : 'system-message') : 'user-message'}>
+                                        {m.system ? (m.error ? '❗' : 'ℹ️') + ' ' + m.text : <><strong>{m.user}:</strong> {m.text}</>}
+                                    </p>
+                                ))}
+                                <div ref={messagesEndRef} /> {/* Element to scroll to */}
+                            </div>
+                            {/* Message sending form */}
+                            <form onSubmit={sendMessage} className="message-form">
+                                <input
+                                    type="text"
+                                    value={messageInput}
+                                    onChange={(e) => setMessageInput(e.target.value)}
+                                    placeholder={isConnected && isUsernameSet ? (amIAtTable ? "Envoyer un message à la table..." : "Envoyer un message au lobby...") : "Connectez-vous pour chatter..."}
+                                    disabled={!isConnected || !isUsernameSet}
+                                />
+                                <button type="submit" disabled={!isConnected || !isUsernameSet || messageInput.trim().length === 0}>Envoyer</button>
+                            </form>
                         </div>
-                        {/* Message sending form */}
-                        <form onSubmit={sendMessage} className="message-form">
-                            <input
-                                type="text"
-                                value={messageInput}
-                                onChange={(e) => setMessageInput(e.target.value)}
-                                placeholder={isConnected && isUsernameSet ? (amIAtTable ? "Envoyer un message à la table..." : "Envoyer un message au lobby...") : "Connectez-vous pour chatter..."}
-                                disabled={!isConnected || !isUsernameSet}
-                            />
-                            <button type="submit" disabled={!isConnected || !isUsernameSet || messageInput.trim().length === 0}>Envoyer</button>
-                        </form>
+
+                        {/* "Leave Table" button - Displayed if at a table */}
+                        {amIAtTable && (
+                             <button onClick={handleLeaveTable} className="leave-button">Quitter la Table</button>
+                        )}
                     </div>
                 </div>
             )}
