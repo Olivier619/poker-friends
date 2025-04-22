@@ -120,11 +120,8 @@ button:hover:not(:disabled) {
 .chat-box {
   border: 1px solid #555;
   padding: 15px;
-  /* Removed top margin here, it will be handled by main-content gap */
-  /* margin-top: 30px; */
   max-width: 400px; /* Adjusted width for right panel */
   width: 100%; /* Make it responsive up to max-width */
-  /* Removed auto margins */
   background-color: #3a3e47;
   border-radius: 8px;
   display: flex;
@@ -196,7 +193,7 @@ button:hover:not(:disabled) {
 /* Lobby and Create Table Styles */
 
 .main-content {
-  display: flex; /* Use flexbox for main sections (lobby/table + chat) */
+  display: flex; /* Use flexbox for main sections (lobby/table + chat container) */
   flex-direction: column; /* Stack by default for smaller screens */
   gap: 20px; /* Space between sections */
   margin-top: 0; /* Handled by App gap */
@@ -308,23 +305,34 @@ button:hover:not(:disabled) {
   margin: 20px auto 0 auto;
 }
 
+/* Container for Chat and Leave Button */
+.chat-and-leave-container {
+  display: flex;
+  flex-direction: column; /* Stack Chat and Button by default */
+  gap: 20px; /* Space between Chat and Button */
+  width: 100%; /* Take full width when stacked */
+  max-width: 400px; /* Max width for chat column */
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+
 /* Responsive layout for larger screens */
 @media (min-width: 900px) {
   .main-content {
-    flex-direction: row; /* Lobby/Table and Chat side by side */
+    flex-direction: row; /* Lobby/Table and Chat Container side by side */
     align-items: stretch; /* Stretch items to fill height */
   }
   .lobby {
     flex: 1; /* Lobby takes available width */
      max-width: none; /* Remove max width in row layout */
   }
-  .chat-box {
-    flex: 0 0 350px; /* Fixed width for chat */
-    margin-top: 0;
+  .chat-and-leave-container {
+     /* flex: 0 0 350px; */ /* Fixed width for chat column - alternative to max-width */
+     margin-top: 0;
   }
   .game-table-container {
     flex: 1; /* Table container takes available width */
-    margin-right: 20px; /* Space between table and chat */
+    margin-right: 20px; /* Space between table and chat container */
     display: flex; /* Use flex for internal layout (info bar + table area + actions) */
     flex-direction: column;
     gap: 15px; /* Space between info bar, table area, actions */
@@ -368,12 +376,12 @@ button:hover:not(:disabled) {
 
 .game-table-area {
   position: relative; /* Allows positioning players relative to this area */
-  width: 95%; /* Make oval slightly smaller than container */
+  width: 98%; /* Make oval slightly smaller than container */
   /* Adjust aspect ratio for a wider/taller oval */
-  padding-bottom: 65%; /* Increased from 60% for taller oval */
-  min-height: 350px; /* Minimum height */
+  padding-bottom: 40%; /* Lower padding-bottom for a much wider/flatter oval */
+  min-height: 300px; /* Minimum height */
   background-color: #0a4020; /* Green felt color */
-  border-radius: 50% / 35%; /* Create an oval shape (adjusted vertical radius) */
+  border-radius: 50% / 15%; /* Create a flatter oval shape (reduced vertical radius) */
   border: 10px solid #5a4b30; /* Table rim color (brown/gold) */
   box-sizing: border-box; /* Include border in dimensions */
   display: flex; /* Use flexbox to center community cards/pot */
@@ -425,17 +433,28 @@ button:hover:not(:disabled) {
 }
 
 /* Positioning for each seat (adjust top/left/transform based on your desired layout) */
-/* Example for 9 players */
-.player-seats .seat-1 { top: 85%; left: 50%; transform: translate(-50%, -50%); } /* Bottom center */
-.player-seats .seat-2 { top: 75%; left: 80%; transform: translate(-50%, -50%); } /* Bottom right */
-.player-seats .seat-3 { top: 55%; left: 92%; transform: translate(-50%, -50%); } /* Mid-right */
-.player-seats .seat-4 { top: 30%; left: 92%; transform: translate(-50%, -50%); } /* Upper-right */
-.player-seats .seat-5 { top: 15%; left: 70%; transform: translate(-50%, -50%); } /* Top right */
-.player-seats .seat-6 { top: 5%; left: 50%; transform: translate(-50%, -50%); } /* Top center */
-.player-seats .seat-7 { top: 15%; left: 30%; transform: translate(-50%, -50%); } /* Top left */
-.player-seats .seat-8 { top: 30%; left: 8%; transform: translate(-50%, -50%); } /* Upper-left */
-.player-seats .seat-9 { top: 55%; left: 8%; transform: translate(-50%, -50%); } /* Mid-left */
-/* .player-seats .seat-10 { ... } */ /* Add for 10 players if needed */
+/* Example for 9 players on a flatter oval */
+.player-seats .seat-1 { bottom: 0; left: 50%; transform: translate(-50%, 0%); } /* Bottom center */
+.player-seats .seat-2 { bottom: 10%; left: 75%; transform: translate(-50%, 0%); } /* Bottom right */
+.player-seats .seat-3 { top: 25%; left: 95%; transform: translate(-50%, -50%); } /* Mid-right */
+.player-seats .seat-4 { top: 25%; left: 5%; transform: translate(-50%, -50%); } /* Mid-left */
+.player-seats .seat-5 { top: 10%; left: 75%; transform: translate(-50%, 0%); } /* Top right */
+.player-seats .seat-6 { top: 0; left: 50%; transform: translate(-50%, 0%); } /* Top center */
+.player-seats .seat-7 { top: 10%; left: 25%; transform: translate(-50%, 0%); } /* Top left */
+.player-seats .seat-8 { bottom: 10%; left: 25%; transform: translate(-50%, 0%); } /* Bottom left */
+.player-seats .seat-9 { top: 50%; left: 50%; transform: translate(-50%, -50%); } /* Center (often for 2 players, or specific layout) - Adjust or remove if not using */
+/* Re-adjust Seat-9 position if using 9 players on a spread-out oval */
+.player-seats .seat-9 { top: 40%; left: 90%; transform: translate(-50%, -50%); } /* Example for a different layout */
+/* Better distribution for 9 seats on flatter oval: */
+.player-seats .seat-1 { bottom: 5%; left: 50%; transform: translate(-50%, 0%); } /* Bottom center */
+.player-seats .seat-2 { bottom: 10%; left: 75%; transform: translate(-50%, 0%); } /* Bottom right */
+.player-seats .seat-3 { bottom: 40%; left: 95%; transform: translate(-50%, -50%); } /* Mid-right */
+.player-seats .seat-4 { top: 40%; left: 95%; transform: translate(-50%, -50%); } /* Upper-right */
+.player-seats .seat-5 { top: 10%; left: 75%; transform: translate(-50%, 0%); } /* Top right */
+.player-seats .seat-6 { top: 5%; left: 50%; transform: translate(-50%, 0%); } /* Top center */
+.player-seats .seat-7 { top: 10%; left: 25%; transform: translate(-50%, 0%); } /* Top left */
+.player-seats .seat-8 { top: 40%; left: 5%; transform: translate(-50%, -50%); } /* Upper-left */
+.player-seats .seat-9 { bottom: 40%; left: 5%; transform: translate(-50%, -50%); } /* Mid-left */
 
 
 /* Style for empty seats */
@@ -528,7 +547,7 @@ button:hover:not(:disabled) {
 
 .player-seats li.winner {
   border-color: gold; /* Highlight winner border */
-  background-color: #5a5030; /* Slightly golden background */
+  background-color: #4d452f; /* Slightly golden background */
 }
 .player-seats li.winner strong {
   color: gold; /* Winner name gold */
@@ -536,7 +555,7 @@ button:hover:not(:disabled) {
 
 /* Mucked status class for player list item */
 .player-seats li.mucked {
-  opacity: 0.5; /* Make mucked players faded */
+  opacity: 0.5;
   border-color: #777;
   background-color: #4a4a4a;
 }
@@ -724,7 +743,7 @@ button:hover:not(:disabled) {
   background-color: #218838;
 }
 
-/* Leave Button */
+/* Leave Button - Now positioned below chat in the chat-and-leave-container */
 .leave-button {
   background-color: #dc3545;
   color: white;
@@ -733,7 +752,10 @@ button:hover:not(:disabled) {
   border-radius: 4px;
   cursor: pointer;
   font-size: 1rem;
-  margin-top: 15px;
+  /* margin-top: 15px; */ /* Removed default margin-top */
+  text-align: center; /* Center button text */
+  width: 100%; /* Make button take full width of its container */
+  box-sizing: border-box; /* Include padding/border in width */
 }
 
 .leave-button:hover:not(:disabled) {
